@@ -10,29 +10,20 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.moxieit.orderplatform.DB.DBService;
 import com.moxieit.orderplatform.function.service.api.AlexaDTO;
 import com.moxieit.orderplatform.function.service.api.AlexaService;
-import com.moxieit.orderplatform.lambda.function.service.impl.AlexaAddressServiceImpl;
 import com.moxieit.orderplatform.lambda.function.service.impl.AlexaBiryaniServiceImpl;
-import com.moxieit.orderplatform.lambda.function.service.impl.AlexaChikuItemServiceImpl;
+import com.moxieit.orderplatform.lambda.function.service.impl.AlexaCancelServiceImpl;
+import com.moxieit.orderplatform.lambda.function.service.impl.AlexaMenuItemServiceImpl;
 import com.moxieit.orderplatform.lambda.function.service.impl.AlexaClosedOrderServiceImpl;
+import com.moxieit.orderplatform.lambda.function.service.impl.AlexaConfirmOrderServiceImpl;
 import com.moxieit.orderplatform.lambda.function.service.impl.AlexaDeliveryServiceImpl;
 import com.moxieit.orderplatform.lambda.function.service.impl.AlexaDesertItemQuantityServiceimpl;
-import com.moxieit.orderplatform.lambda.function.service.impl.AlexaDessertsServiceImpl;
+import com.moxieit.orderplatform.lambda.function.service.impl.AlexaRecentOrderServiceImpl;
 import com.moxieit.orderplatform.lambda.function.service.impl.AlexaGetStartedServiceImpl;
-import com.moxieit.orderplatform.lambda.function.service.impl.AlexaMainCourseItemsServiceImpl;
-import com.moxieit.orderplatform.lambda.function.service.impl.AlexaMainCourseServiceImpl;
-import com.moxieit.orderplatform.lambda.function.service.impl.AlexaMangolassitemServiceImpl;
-import com.moxieit.orderplatform.lambda.function.service.impl.AlexaMediumServiceImpl;
 import com.moxieit.orderplatform.lambda.function.service.impl.AlexaMenuCategoriesServiceImpl;
-import com.moxieit.orderplatform.lambda.function.service.impl.AlexaMildServiceImpl;
 import com.moxieit.orderplatform.lambda.function.service.impl.AlexaNewOrderServiceImpl;
-import com.moxieit.orderplatform.lambda.function.service.impl.AlexaOneQuantityServiceImpl;
-import com.moxieit.orderplatform.lambda.function.service.impl.AlexaPhoneNumberServiceImpl;
-import com.moxieit.orderplatform.lambda.function.service.impl.AlexaPickUpServiceImpl;
 import com.moxieit.orderplatform.lambda.function.service.impl.AlexaQuantityServiceImpl;
-import com.moxieit.orderplatform.lambda.function.service.impl.AlexaSideOrdersServiceImpl;
+import com.moxieit.orderplatform.lambda.function.service.impl.AlexaPickUpServiceImpl;
 import com.moxieit.orderplatform.lambda.function.service.impl.AlexaSpicyServiceImpl;
-import com.moxieit.orderplatform.lambda.function.service.impl.AlexaThreeQuantityServiceImpl;
-import com.moxieit.orderplatform.lambda.function.service.impl.AlexaTwoQuantityServiceImpl;
 import com.moxieit.orderplatform.lambda.response.BaseResponse;
 
 public class AlexaOrchestration implements RequestHandler<Object, BaseResponse> {
@@ -126,7 +117,7 @@ public class AlexaOrchestration implements RequestHandler<Object, BaseResponse> 
 			alexaDTO.setRequest(request);
 			return alexaService.serveLex(alexaDTO, context);
 		} else if (intentName.equalsIgnoreCase("RecentOrder")) {
-			AlexaService alexaService = new AlexaEasyOrderServiceImpl();
+			AlexaService alexaService = new AlexaRecentOrderServiceImpl();
 			AlexaDTO alexaDTO = new AlexaDTO();
 			alexaDTO.setApplicationId(applicationId);
 			alexaDTO.setUserId(alexaUserId);
@@ -140,6 +131,8 @@ public class AlexaOrchestration implements RequestHandler<Object, BaseResponse> 
 			alexaDTO.setApplicationId(applicationId);
 			alexaDTO.setUserId(alexaUserId);
 			alexaDTO.setRequest(request);
+			alexaDTO.setDeviceId(deviceId);
+			alexaDTO.setConsentToken(consentToken);
 			return alexaService.serveLex(alexaDTO, context);
 		} else if (intentName.equalsIgnoreCase("PickUp")) {
 			AlexaService alexaService = new AlexaPickUpServiceImpl();
@@ -148,22 +141,7 @@ public class AlexaOrchestration implements RequestHandler<Object, BaseResponse> 
 			alexaDTO.setUserId(alexaUserId);
 			alexaDTO.setRequest(request);
 			return alexaService.serveLex(alexaDTO, context);
-		/*} else if (intentName.equalsIgnoreCase("PhoneNumber")) {
-			AlexaService alexaService = new AlexaPhoneNumberServiceImpl();
-			AlexaDTO alexaDTO = new AlexaDTO();
-			alexaDTO.setApplicationId(applicationId);
-			alexaDTO.setUserId(alexaUserId);
-			alexaDTO.setRequest(request1);
-			return alexaService.serveLex(alexaDTO, context);
-		} else if (intentName.equalsIgnoreCase("Address")) {
-			AlexaService alexaService = new AlexaAddressServiceImpl();
-			AlexaDTO alexaDTO = new AlexaDTO();
-			alexaDTO.setApplicationId(applicationId);
-			alexaDTO.setUserId(alexaUserId);
-			alexaDTO.setRequest(request);
-			alexaDTO.setDeviceId(deviceId);
-			alexaDTO.setConsentToken(consentToken);
-			return alexaService.serveLex(alexaDTO, context);*/
+		
 		} else if (intentName.equalsIgnoreCase("Menu")) {
 			AlexaService alexaService = new AlexaMenuCategoriesServiceImpl();
 			AlexaDTO alexaDTO = new AlexaDTO();
@@ -171,13 +149,7 @@ public class AlexaOrchestration implements RequestHandler<Object, BaseResponse> 
 			alexaDTO.setUserId(alexaUserId);
 			alexaDTO.setRequest(request);
 			return alexaService.serveLex(alexaDTO, context);
-		/*} else if (intentName.equalsIgnoreCase("MainCourse")) {
-			AlexaService alexaService = new AlexaMainCourseServiceImpl();
-			AlexaDTO alexaDTO = new AlexaDTO();
-			alexaDTO.setApplicationId(applicationId);
-			alexaDTO.setUserId(alexaUserId);
-			alexaDTO.setRequest(request);
-			return alexaService.serveLex(alexaDTO, context);*/
+		
 		} else if (intentName.equalsIgnoreCase("Biryani") || intentName.equalsIgnoreCase("SideOrders")  
 				|| intentName.equalsIgnoreCase("Desserts") || intentName.equalsIgnoreCase("MainCourse")) {
 			AlexaService alexaService = new AlexaBiryaniServiceImpl();
@@ -187,42 +159,15 @@ public class AlexaOrchestration implements RequestHandler<Object, BaseResponse> 
 			alexaDTO.setRequest(request);
 			alexaDTO.setIntentName(intentName);
 			return alexaService.serveLex(alexaDTO, context);
-		/*} else if (intentName.equalsIgnoreCase("SideOrders")) {
-			AlexaService alexaService = new AlexaSideOrdersServiceImpl();
-			AlexaDTO alexaDTO = new AlexaDTO();
-			alexaDTO.setApplicationId(applicationId);
-			alexaDTO.setUserId(alexaUserId);
-			alexaDTO.setRequest(request);
-			return alexaService.serveLex(alexaDTO, context);
-		} else if (intentName.equalsIgnoreCase("Desserts")) {
-			AlexaService alexaService = new AlexaDessertsServiceImpl();
-			AlexaDTO alexaDTO = new AlexaDTO();
-			alexaDTO.setApplicationId(applicationId);
-			alexaDTO.setUserId(alexaUserId);
-			alexaDTO.setRequest(request);
-			return alexaService.serveLex(alexaDTO, context);*/
+		
 		} else if (intentName.equalsIgnoreCase("MenuItem")) {
-			AlexaService alexaService = new AlexaChikuItemServiceImpl();
+			AlexaService alexaService = new AlexaMenuItemServiceImpl();
 			AlexaDTO alexaDTO = new AlexaDTO();
 			alexaDTO.setApplicationId(applicationId);
 			alexaDTO.setUserId(alexaUserId);
 			alexaDTO.setRequest(request);
 			return alexaService.serveLex(alexaDTO, context);
-		/*} else if (request.equalsIgnoreCase("Mangolassi")) {
-			AlexaService alexaService = new AlexaMangolassitemServiceImpl();
-			AlexaDTO alexaDTO = new AlexaDTO();
-			alexaDTO.setApplicationId(applicationId);
-			alexaDTO.setUserId(alexaUserId);
-			alexaDTO.setRequest(request);
-			return alexaService.serveLex(alexaDTO, context);
-		} else if (request.equalsIgnoreCase("SideOrderItems") || request.equalsIgnoreCase("MainCourseItems")
-				|| request.equalsIgnoreCase("BiryaniItems")) {
-			AlexaService alexaService = new AlexaQuantityServiceImpl();
-			AlexaDTO alexaDTO = new AlexaDTO();
-			alexaDTO.setApplicationId(applicationId);
-			alexaDTO.setUserId(alexaUserId);
-			alexaDTO.setRequest(request);
-			return alexaService.serveLex(alexaDTO, context);*/
+		
 		} else if (request.equalsIgnoreCase("DessertsItems")) {
 			AlexaService alexaService = new AlexaDesertItemQuantityServiceimpl();
 			AlexaDTO alexaDTO = new AlexaDTO();
@@ -230,15 +175,9 @@ public class AlexaOrchestration implements RequestHandler<Object, BaseResponse> 
 			alexaDTO.setUserId(alexaUserId);
 			alexaDTO.setRequest(request);
 			return alexaService.serveLex(alexaDTO, context);
-		/*} else if (request.equalsIgnoreCase("Quantity")) {
-			AlexaService alexaService = new AlexaMainCourseItemsServiceImpl();
-			AlexaDTO alexaDTO = new AlexaDTO();
-			alexaDTO.setApplicationId(applicationId);
-			alexaDTO.setUserId(alexaUserId);
-			alexaDTO.setRequest(request);
-			return alexaService.serveLex(alexaDTO, context);*/
+		
 		} else if (intentName.equalsIgnoreCase("Quantity")) {
-			AlexaService alexaService = new AlexaOneQuantityServiceImpl();
+			AlexaService alexaService = new AlexaQuantityServiceImpl();
 			AlexaDTO alexaDTO = new AlexaDTO();
 			alexaDTO.setApplicationId(applicationId);
 			alexaDTO.setUserId(alexaUserId);
@@ -246,34 +185,7 @@ public class AlexaOrchestration implements RequestHandler<Object, BaseResponse> 
 			alexaDTO.setDeviceId(deviceId);
 			alexaDTO.setConsentToken(consentToken);
 			return alexaService.serveLex(alexaDTO, context);
-		/*} else if (request.equalsIgnoreCase("Two")) {
-			AlexaService alexaService = new AlexaTwoQuantityServiceImpl();
-			AlexaDTO alexaDTO = new AlexaDTO();
-			alexaDTO.setApplicationId(applicationId);
-			alexaDTO.setUserId(alexaUserId);
-			alexaDTO.setRequest(request);
-			return alexaService.serveLex(alexaDTO, context);
-		} else if (request.equalsIgnoreCase("Three")) {
-			AlexaService alexaService = new AlexaThreeQuantityServiceImpl();
-			AlexaDTO alexaDTO = new AlexaDTO();
-			alexaDTO.setApplicationId(applicationId);
-			alexaDTO.setUserId(alexaUserId);
-			alexaDTO.setRequest(request);
-			return alexaService.serveLex(alexaDTO, context);
-		} else if (request.equalsIgnoreCase("Mild")) {
-			AlexaService alexaService = new AlexaMildServiceImpl();
-			AlexaDTO alexaDTO = new AlexaDTO();
-			alexaDTO.setApplicationId(applicationId);
-			alexaDTO.setUserId(alexaUserId);
-			alexaDTO.setRequest(request);
-			return alexaService.serveLex(alexaDTO, context);
-		} else if (request.equalsIgnoreCase("Medium")) {
-			AlexaService alexaService = new AlexaMediumServiceImpl();
-			AlexaDTO alexaDTO = new AlexaDTO();
-			alexaDTO.setApplicationId(applicationId);
-			alexaDTO.setUserId(alexaUserId);
-			alexaDTO.setRequest(request);
-			return alexaService.serveLex(alexaDTO, context);*/
+		
 		} else if (intentName.equalsIgnoreCase("SpicyLevel")) {
 			AlexaService alexaService = new AlexaSpicyServiceImpl();
 			AlexaDTO alexaDTO = new AlexaDTO();
@@ -288,8 +200,24 @@ public class AlexaOrchestration implements RequestHandler<Object, BaseResponse> 
 			alexaDTO.setUserId(alexaUserId);
 			alexaDTO.setRequest(request);
 			return alexaService.serveLex(alexaDTO, context);*/
-		}	else if (intentName.equalsIgnoreCase("CheckOut")) {
+		}	else if (intentName.equalsIgnoreCase("AMAZON.StopIntent") || intentName.equalsIgnoreCase("AMAZON.CancelIntent") ||
+				intentName.equalsIgnoreCase("AMAZON.HelpIntent")) {
+			AlexaService alexaService = new AlexaCancelServiceImpl();
+			AlexaDTO alexaDTO = new AlexaDTO();
+			alexaDTO.setApplicationId(applicationId);
+			alexaDTO.setUserId(alexaUserId);
+			alexaDTO.setRequest(request);
+			alexaDTO.setIntentName(intentName);
+			return alexaService.serveLex(alexaDTO, context);
+		}else if (intentName.equalsIgnoreCase("CheckOut")) {
 			AlexaService alexaService = new AlexaClosedOrderServiceImpl();
+			AlexaDTO alexaDTO = new AlexaDTO();
+			alexaDTO.setApplicationId(applicationId);
+			alexaDTO.setUserId(alexaUserId);
+			alexaDTO.setRequest(request);
+			return alexaService.serveLex(alexaDTO, context);
+		} else if (intentName.equalsIgnoreCase("Confirm")) {
+			AlexaService alexaService = new AlexaConfirmOrderServiceImpl();
 			AlexaDTO alexaDTO = new AlexaDTO();
 			alexaDTO.setApplicationId(applicationId);
 			alexaDTO.setUserId(alexaUserId);

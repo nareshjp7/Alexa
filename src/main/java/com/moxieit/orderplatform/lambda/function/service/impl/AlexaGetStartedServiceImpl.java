@@ -36,7 +36,7 @@ public class AlexaGetStartedServiceImpl implements AlexaService {
 		outputSpeech.setSsml("<speak>Hi, Would you like to place a Recent order or Start a new Order.</speak>");
 		outputSpeech.setType("SSML");
 		Card card = new Card();
-		card.setTitle("Audio");
+		card.setTitle("Start a Order");
 		card.setType("Simple");
 		card.setContent("Hi, Would you like to place a Recent order or Start a new Order.");
 		Reprompt reprompt = new Reprompt();

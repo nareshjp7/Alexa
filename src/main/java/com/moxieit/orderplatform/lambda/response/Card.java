@@ -1,5 +1,7 @@
 package com.moxieit.orderplatform.lambda.response;
 
+import java.util.Set;
+
 public class Card {
 
 	private String type;
@@ -7,6 +9,7 @@ public class Card {
 	private String title;
 
 	private String content;
+	private Set<String> permissions;
 
 	public String getType() {
 		return type;
@@ -30,6 +33,14 @@ public class Card {
 
 	public void setContent(String content) {
 		this.content = content;
+	}
+
+	public Set<String> getPermissions() {
+		return permissions;
+	}
+
+	public void setPermissions(Set<String> permissions2) {
+		this.permissions = permissions2;
 	}
 
 }

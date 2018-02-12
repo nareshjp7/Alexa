@@ -18,12 +18,12 @@ public class AlexaClosedOrderServiceImpl implements AlexaService {
 		Response response = new Response();
 		OutputSpeech outputSpeech = new OutputSpeech();
 		outputSpeech.setSsml(
-				"<speak>Thank you.</speak>");
+				"<speak>Your order was confirmed. Thank you.</speak>");
 		outputSpeech.setType("SSML");
 		Card card = new Card();
-		card.setTitle("Audio");
+		card.setTitle("Order is Confirmed");
 		card.setType("Simple");
-		card.setContent("Thank you.");
+		card.setContent("Your order was confirmed. Thank you.");
 		Reprompt reprompt = new Reprompt();
 		OutputSpeech outputSpeech1 = new OutputSpeech();
 		outputSpeech1.setText("Can I help you with anything else?");

@@ -20,7 +20,7 @@ public class AlexaDesertItemQuantityServiceimpl implements AlexaService {
 		outputSpeech.setSsml("<speak>How much quantity do you want for this order.</speak>");
 		outputSpeech.setType("SSML");
 		Card card = new Card();
-		card.setTitle("Audio");
+		card.setTitle("Add Quantity");
 		card.setType("Simple");
 		card.setContent("How much quantity do you want for this order.");
 		Reprompt reprompt = new Reprompt();

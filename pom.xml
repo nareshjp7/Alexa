@@ -13,6 +13,13 @@
 			<artifactId>restfb</artifactId>
 			<version>2.0.0-rc.3</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple -->
+<dependency>
+    <groupId>com.googlecode.json-simple</groupId>
+    <artifactId>json-simple</artifactId>
+    <version>1.1</version>
+</dependency>
+		
 		<!-- https://mvnrepository.com/artifact/com.amazon.alexa/alexa-skills-kit -->
 		<dependency>
 			<groupId>com.amazon.alexa</groupId>
@@ -25,6 +32,18 @@
 			<groupId>com.amazonaws</groupId>
 			<artifactId>aws-java-sdk-lambda</artifactId>
 			<version>1.11.128</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-sns -->
+<dependency>
+    <groupId>com.amazonaws</groupId>
+    <artifactId>aws-java-sdk-sns</artifactId>
+    <version>1.11.183</version>
+</dependency>
+<!-- https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-ses -->
+		<dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk-ses</artifactId>
+			<version>1.11.164</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-collections4 -->
 		<dependency>
@@ -67,6 +86,12 @@
 			<artifactId>gson</artifactId>
 			<version>2.2.2</version>
 		</dependency>
+    <!-- https://mvnrepository.com/artifact/com.google.appengine/appengine-tools-sdk -->
+<dependency>
+    <groupId>com.google.appengine</groupId>
+    <artifactId>appengine-tools-sdk</artifactId>
+    <version>1.9.60</version>
+</dependency>
 		<!-- https://mvnrepository.com/artifact/org.springframework/spring-core -->
 		<dependency>
 			<groupId>org.springframework</groupId>

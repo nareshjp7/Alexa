@@ -1,65 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" output="target/test-classes" path="src/test/java">
-		<attributes>
-			<attribute name="optional" value="true"/>
-			<attribute name="maven.pomderived" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="src" output="target/classes" path="src/main/java">
-		<attributes>
-			<attribute name="optional" value="true"/>
-			<attribute name="maven.pomderived" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry excluding="**" kind="src" output="target/classes" path="src/main/resources">
-		<attributes>
-			<attribute name="maven.pomderived" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="var" path="M2_REPO/javax/mail/mail/1.4/mail-1.4.jar"/>
-	<classpathentry kind="var" path="M2_REPO/javax/activation/activation/1.1/activation-1.1.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8">
-		<attributes>
-			<attribute name="maven.pomderived" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="var" path="M2_REPO/com/restfb/restfb/2.0.0-rc.3/restfb-2.0.0-rc.3.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/amazon/alexa/alexa-skills-kit/1.1/alexa-skills-kit-1.1.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/amazonaws/aws-java-sdk-lambda/1.11.128/aws-java-sdk-lambda-1.11.128.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/amazonaws/aws-java-sdk-core/1.11.128/aws-java-sdk-core-1.11.128.jar"/>
-	<classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/httpcomponents/httpclient/4.5.2/httpclient-4.5.2.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/httpcomponents/httpcore/4.4.4/httpcore-4.4.4.jar"/>
-	<classpathentry kind="var" path="M2_REPO/commons-codec/commons-codec/1.9/commons-codec-1.9.jar"/>
-	<classpathentry kind="var" path="M2_REPO/software/amazon/ion/ion-java/1.0.2/ion-java-1.0.2.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/fasterxml/jackson/core/jackson-databind/2.6.6/jackson-databind-2.6.6.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/fasterxml/jackson/core/jackson-annotations/2.6.0/jackson-annotations-2.6.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/fasterxml/jackson/core/jackson-core/2.6.6/jackson-core-2.6.6.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/fasterxml/jackson/dataformat/jackson-dataformat-cbor/2.6.6/jackson-dataformat-cbor-2.6.6.jar"/>
-	<classpathentry kind="var" path="M2_REPO/joda-time/joda-time/2.8.1/joda-time-2.8.1.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/amazonaws/jmespath-java/1.11.128/jmespath-java-1.11.128.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/commons/commons-collections4/4.0/commons-collections4-4.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/commons/commons-lang3/3.0/commons-lang3-3.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-api/1.8.0-alpha2/slf4j-api-1.8.0-alpha2.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/amazonaws/aws-java-sdk-ses/1.11.164/aws-java-sdk-ses-1.11.164.jar"/>
-	<classpathentry kind="var" path="M2_REPO/commons-io/commons-io/1.3.2/commons-io-1.3.2.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/google/code/gson/gson/2.2.2/gson-2.2.2.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-core/2.5.6/spring-core-2.5.6.jar"/>
-	<classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.17/log4j-1.2.17.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/amazonaws/aws-java-sdk-lex/1.11.144/aws-java-sdk-lex-1.11.144.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/google/collections/google-collections/1.0-rc2/google-collections-1.0-rc2.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/google/guava/guava/18.0/guava-18.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/amazonaws/aws-lambda-java-core/1.0.0/aws-lambda-java-core-1.0.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/amazonaws/aws-java-sdk-dynamodb/1.11.132/aws-java-sdk-dynamodb-1.11.132.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/amazonaws/aws-java-sdk-s3/1.11.132/aws-java-sdk-s3-1.11.132.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/amazonaws/aws-java-sdk-kms/1.11.132/aws-java-sdk-kms-1.11.132.jar"/>
-	<classpathentry kind="var" path="M2_REPO/junit/junit/4.9/junit-4.9.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/hamcrest/hamcrest-core/1.1/hamcrest-core-1.1.jar"/>
-	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
-		<attributes>
-			<attribute name="maven.pomderived" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="output" path="target/classes"/>
+  <classpathentry kind="src" path="src/test/java" output="target/test-classes" including="**/*.java"/>
+  <classpathentry kind="src" path="src/main/java" including="**/*.java"/>
+  <classpathentry kind="src" path="src/main/resources" excluding="**/*.java"/>
+  <classpathentry kind="output" path="target/classes"/>
+  <classpathentry kind="var" path="M2_REPO/javax/mail/mail/1.4/mail-1.4.jar"/>
+  <classpathentry kind="var" path="M2_REPO/javax/activation/activation/1.1/activation-1.1.jar"/>
+  <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+  <classpathentry kind="var" path="M2_REPO/com/restfb/restfb/2.0.0-rc.3/restfb-2.0.0-rc.3.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/googlecode/json-simple/json-simple/1.1/json-simple-1.1.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/amazon/alexa/alexa-skills-kit/1.1/alexa-skills-kit-1.1.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/amazonaws/aws-java-sdk-lambda/1.11.128/aws-java-sdk-lambda-1.11.128.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/amazonaws/aws-java-sdk-core/1.11.128/aws-java-sdk-core-1.11.128.jar"/>
+  <classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/httpcomponents/httpclient/4.5.2/httpclient-4.5.2.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/httpcomponents/httpcore/4.4.4/httpcore-4.4.4.jar"/>
+  <classpathentry kind="var" path="M2_REPO/commons-codec/commons-codec/1.9/commons-codec-1.9.jar"/>
+  <classpathentry kind="var" path="M2_REPO/software/amazon/ion/ion-java/1.0.2/ion-java-1.0.2.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/fasterxml/jackson/core/jackson-databind/2.6.6/jackson-databind-2.6.6.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/fasterxml/jackson/core/jackson-annotations/2.6.0/jackson-annotations-2.6.0.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/fasterxml/jackson/core/jackson-core/2.6.6/jackson-core-2.6.6.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/fasterxml/jackson/dataformat/jackson-dataformat-cbor/2.6.6/jackson-dataformat-cbor-2.6.6.jar"/>
+  <classpathentry kind="var" path="M2_REPO/joda-time/joda-time/2.8.1/joda-time-2.8.1.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/amazonaws/jmespath-java/1.11.128/jmespath-java-1.11.128.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/amazonaws/aws-java-sdk-sns/1.11.183/aws-java-sdk-sns-1.11.183.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/amazonaws/aws-java-sdk-sqs/1.11.183/aws-java-sdk-sqs-1.11.183.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/amazonaws/aws-java-sdk-ses/1.11.164/aws-java-sdk-ses-1.11.164.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/commons/commons-collections4/4.0/commons-collections4-4.0.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/commons/commons-lang3/3.0/commons-lang3-3.0.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-api/1.8.0-alpha2/slf4j-api-1.8.0-alpha2.jar"/>
+  <classpathentry kind="var" path="M2_REPO/commons-io/commons-io/1.3.2/commons-io-1.3.2.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/google/code/gson/gson/2.2.2/gson-2.2.2.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/google/appengine/appengine-tools-sdk/1.9.60/appengine-tools-sdk-1.9.60.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/springframework/spring-core/2.5.6/spring-core-2.5.6.jar"/>
+  <classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.17/log4j-1.2.17.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/amazonaws/aws-java-sdk-lex/1.11.144/aws-java-sdk-lex-1.11.144.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/google/collections/google-collections/1.0-rc2/google-collections-1.0-rc2.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/google/guava/guava/18.0/guava-18.0.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/amazonaws/aws-lambda-java-core/1.0.0/aws-lambda-java-core-1.0.0.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/amazonaws/aws-java-sdk-dynamodb/1.11.132/aws-java-sdk-dynamodb-1.11.132.jar" sourcepath="M2_REPO/com/amazonaws/aws-java-sdk-dynamodb/1.11.132/aws-java-sdk-dynamodb-1.11.132-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/amazonaws/aws-java-sdk-s3/1.11.132/aws-java-sdk-s3-1.11.132.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/amazonaws/aws-java-sdk-kms/1.11.132/aws-java-sdk-kms-1.11.132.jar"/>
+  <classpathentry kind="var" path="M2_REPO/junit/junit/4.9/junit-4.9.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/hamcrest/hamcrest-core/1.1/hamcrest-core-1.1.jar"/>
 </classpath>
