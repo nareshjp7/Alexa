@@ -33,6 +33,7 @@ import com.moxieit.orderplatform.lambda.function.service.impl.GoogleQuantityServ
 import com.moxieit.orderplatform.lambda.function.service.impl.GoogleSpicyLevelServiceImpl;
 import com.moxieit.orderplatform.lambda.function.service.impl.GoogleTransactionDecision;
 import com.moxieit.orderplatform.lambda.function.service.impl.GoogleTransactionRequirementsCheckServiceImpl;
+import com.moxieit.orderplatform.lambda.function.service.impl.GoogleTransactionsConfirmationDecision;
 import com.moxieit.orderplatform.lambda.function.service.impl.GooglepermissionsServiceImpl;
 import com.moxieit.orderplatform.lambda.function.service.impl.GoogleRecentOrderServiceImpl;
 import com.moxieit.orderplatform.lambda.response.BaseResponse;
@@ -43,6 +44,8 @@ public class GoogleHomeOrchestration implements RequestStreamHandler {
 	@SuppressWarnings("unchecked")
 	 public void handleRequest(InputStream inputStream, OutputStream outputStream, Context context) throws IOException {
 	//public BaseResponse handleRequest(Object input, Context context) {
+		String botName = "SITARA";
+		String restaurantId = "23";
 	    JSONParser parser = new JSONParser();
 		BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 		JSONObject event = new JSONObject();
@@ -55,12 +58,14 @@ public class GoogleHomeOrchestration implements RequestStreamHandler {
 		}
 		
 		System.out.println("my input:" + event);
+		 Map<String, String > maptime = new HashMap<String,  String>();
 		Map<String, Map<String, Map<String, String>>> map = new HashMap<String, Map<String, Map<String, String>>>();
 		Map<String, Map<String, Map<String,Map<String,Map<String, String>>>>> device = new HashMap<String, Map<String,Map<String, Map<String,Map<String, String>>>>>();
 		Map<String, Map<String, Map<String, Map<String, String>>>> useridmap = new HashMap<String, Map<String, Map<String, Map<String, String>>>>();
 		Map<String, Map<String, Map<String, List<Map<String, List<Map<String, String>>>>>>> requestmap = new HashMap<String, Map<String, Map<String, List<Map<String, List<Map<String, String>>>>>>>();
 		Map<String, Map<String, Map<String, List<Map<String, List<Map<String,  Map<String, String>>>>>>>> resultcheck = new HashMap<String, Map<String, Map<String, List<Map<String, List<Map<String, Map<String, String>>>>>>>>();
 		Map<String,  Map<String,List<Map<String, Map<String, String>>>>> integerValue = new HashMap<String, Map<String,List<Map<String, Map<String, String>>>>>();
+		maptime = (Map<String, String>) event;
 		map = (Map<String, Map<String, Map<String, String>>>) event;
 		device = (Map<String, Map<String, Map<String,Map<String,Map<String, String>>>>>) event;
 		useridmap = (Map<String, Map<String, Map<String, Map<String, String>>>>) event;
@@ -69,7 +74,7 @@ public class GoogleHomeOrchestration implements RequestStreamHandler {
 		resultcheck = (Map<String, Map<String, Map<String, List<Map<String, List<Map<String,Map<String, String>>>>>>>>) event;
 		
 		String request = (String) requestmap.get("originalRequest").get("data").get("inputs").get(0).get("rawInputs").get(0).get("query");
-		
+		 String timestamp = (String) maptime.get("timestamp");
 		System.out.println("request value" + request);
 
 		String intentName = (String) map.get("result").get("metadata").get("intentName");
@@ -106,6 +111,8 @@ public class GoogleHomeOrchestration implements RequestStreamHandler {
 			googleDTO.setUserId(userId);
 			googleDTO.setRequest(request);
 			googleDTO.setIntentName(intentName);
+			googleDTO.setBotName(botName);
+			googleDTO.setRestaurantId(restaurantId);
 			try {
 				 json = mapper.writeValueAsString(googleService.serveLex(googleDTO, context));			 
 				} catch (JsonProcessingException e) {
@@ -121,7 +128,8 @@ public class GoogleHomeOrchestration implements RequestStreamHandler {
 			googleDTO.setUserId(userId);
 			googleDTO.setRequest(request);
 			googleDTO.setIntentName(intentName);
-			
+			googleDTO.setBotName(botName);
+			googleDTO.setRestaurantId(restaurantId);
 			try {
 			 json = mapper.writeValueAsString(googleService.serveLex(googleDTO, context));			 
 			} catch (JsonProcessingException e) {
@@ -130,13 +138,19 @@ public class GoogleHomeOrchestration implements RequestStreamHandler {
 			writer.write(json);  
 	        writer.close();
 			return;
-		} else if (intentName.equalsIgnoreCase("Biryani") || intentName.equalsIgnoreCase("SideOrders")
-				|| intentName.equalsIgnoreCase("Desserts") || intentName.equalsIgnoreCase("MainCourse")) {
+		} else if (intentName.equalsIgnoreCase("QuickBites") || intentName.equalsIgnoreCase("SideOrders")
+				|| intentName.equalsIgnoreCase("Desserts") || intentName.equalsIgnoreCase("MainCourse")
+				|| intentName.equalsIgnoreCase("ComboCorner") || intentName.equalsIgnoreCase("DosaCorner")
+				|| intentName.equalsIgnoreCase("RiceCorner") || intentName.equalsIgnoreCase("KothuParatha")
+				|| intentName.equalsIgnoreCase("Drinks") || intentName.equalsIgnoreCase("Pastries")
+				|| intentName.equalsIgnoreCase("Kothu Paratha")) {
 			GoogleCategoriesServiceImpl googleService = new GoogleCategoriesServiceImpl();
 			GoogleDTO googleDTO = new GoogleDTO();
 			googleDTO.setUserId(userId);
 			googleDTO.setRequest(request);
 			googleDTO.setIntentName(intentName);
+			googleDTO.setBotName(botName);
+			googleDTO.setRestaurantId(restaurantId);
 			try {
 				 json = mapper.writeValueAsString(googleService.serveLex(googleDTO, context));			 
 				} catch (JsonProcessingException e) {
@@ -151,6 +165,8 @@ public class GoogleHomeOrchestration implements RequestStreamHandler {
 			googleDTO.setUserId(userId);
 			googleDTO.setRequest(request);
 			googleDTO.setIntentName(intentName);
+			googleDTO.setBotName(botName);
+			googleDTO.setRestaurantId(restaurantId);
 			try {
 				 json = mapper.writeValueAsString(googleService.serveLex(googleDTO, context));			 
 				} catch (JsonProcessingException e) {
@@ -160,17 +176,24 @@ public class GoogleHomeOrchestration implements RequestStreamHandler {
 		        writer.close();
 				return;
 		} else if (intentName.equalsIgnoreCase("Quantity")) {
+			String intvalue = null;
+			String quantity = null;
 			try{
-			String intvalue = (String)integerValue.get("result").get("contexts").get(0).get("parameters").get("number-sequence");
+			intvalue = (String)integerValue.get("result").get("contexts").get(0).get("parameters").get("number");
+			quantity = (String) map.get("result").get("parameters").get("number");
+			System.out.println("Google intvalue is"+ intvalue);
+			System.out.println("Google intvalue is "+quantity);
 			}catch(Exception e){
-				
+				System.out.println("Google intvalue is null");
 			}
 			GoogleQuantityServiceImpl googleService = new GoogleQuantityServiceImpl();
 			GoogleDTO googleDTO = new GoogleDTO();
 			googleDTO.setUserId(userId);
 			googleDTO.setRequest(request);
 			googleDTO.setIntentName(intentName);
-			//googleDTO.setQuantityValue(intvalue);
+			googleDTO.setBotName(botName);
+			googleDTO.setRestaurantId(restaurantId);			
+			googleDTO.setQuantityValue(quantity);
 			try {
 				 json = mapper.writeValueAsString(googleService.serveLex(googleDTO, context));			 
 				} catch (JsonProcessingException e) {
@@ -185,6 +208,8 @@ public class GoogleHomeOrchestration implements RequestStreamHandler {
 			googleDTO.setUserId(userId);
 			googleDTO.setRequest(request);
 			googleDTO.setIntentName(intentName);
+			googleDTO.setBotName(botName);
+			googleDTO.setRestaurantId(restaurantId);
 			try {
 				 json = mapper.writeValueAsString(googleService.serveLex(googleDTO, context));			 
 				} catch (JsonProcessingException e) {
@@ -198,7 +223,9 @@ public class GoogleHomeOrchestration implements RequestStreamHandler {
 			GoogleDTO googleDTO = new GoogleDTO();
 			googleDTO.setUserId(userId);
 			googleDTO.setRequest(request);
-			googleDTO.setIntentName(intentName);			
+			googleDTO.setIntentName(intentName);
+			googleDTO.setBotName(botName);
+			googleDTO.setRestaurantId(restaurantId);
 			try {
 				 json = mapper.writeValueAsString(googleService.serveLex(googleDTO, context));			 
 				} catch (JsonProcessingException e) {
@@ -214,6 +241,8 @@ public class GoogleHomeOrchestration implements RequestStreamHandler {
 			googleDTO.setUserId(userId);
 			googleDTO.setRequest(request);
 			googleDTO.setIntentName(intentName);
+			googleDTO.setBotName(botName);
+			googleDTO.setRestaurantId(restaurantId);
 			try {
 				 json = mapper.writeValueAsString(googleService.serveLex(googleDTO, context));			 
 				} catch (JsonProcessingException e) {
@@ -228,6 +257,8 @@ public class GoogleHomeOrchestration implements RequestStreamHandler {
 			googleDTO.setUserId(userId);
 			googleDTO.setRequest(request);
 			googleDTO.setIntentName(intentName);
+			googleDTO.setBotName(botName);
+			googleDTO.setRestaurantId(restaurantId);
 			try {
 				 json = mapper.writeValueAsString(googleService.serveLex(googleDTO, context));			 
 				} catch (JsonProcessingException e) {
@@ -236,12 +267,14 @@ public class GoogleHomeOrchestration implements RequestStreamHandler {
 				writer.write(json);  
 		        writer.close();
 				return;
-		} /*else if (request.matches("^\\d{10}$") || request.matches("^\\+(?:[0-9] ?){6,14}[0-9]$")) {
+		} else if (intentName.equalsIgnoreCase("PhoneNumber")) {
 			GooglePhoneNumberServiceImpl googleService = new GooglePhoneNumberServiceImpl();
 			GoogleDTO googleDTO = new GoogleDTO();
 			googleDTO.setUserId(userId);
 			googleDTO.setRequest(request);
 			googleDTO.setIntentName(intentName);
+			googleDTO.setBotName(botName);
+			googleDTO.setRestaurantId(restaurantId);
 			try {
 				 json = mapper.writeValueAsString(googleService.serveLex(googleDTO, context));			 
 				} catch (JsonProcessingException e) {
@@ -250,7 +283,7 @@ public class GoogleHomeOrchestration implements RequestStreamHandler {
 				writer.write(json);  
 		        writer.close();
 				return;
-		}*/else if (intentName.equalsIgnoreCase("user_info")) {
+		} else if (intentName.equalsIgnoreCase("user_info")) {
 			GooglepermissionsServiceImpl googleService = new GooglepermissionsServiceImpl();
 			GoogleDTO googleDTO = new GoogleDTO();
 			googleDTO.setUserId(userId);
@@ -258,6 +291,8 @@ public class GoogleHomeOrchestration implements RequestStreamHandler {
 			googleDTO.setIntentName(intentName);
 			googleDTO.setFormattedAddress(formattedAddress);
 			googleDTO.setPermissionsGranted(permissionsGranted);
+			googleDTO.setBotName(botName);
+			googleDTO.setRestaurantId(restaurantId);
 			try {
 				 json = mapper.writeValueAsString(googleService.serveLex(googleDTO, context));			 
 				} catch (JsonProcessingException e) {
@@ -274,6 +309,8 @@ public class GoogleHomeOrchestration implements RequestStreamHandler {
 			googleDTO.setIntentName(intentName);
 			googleDTO.setFormattedAddress(formattedAddress);
 			googleDTO.setPermissionsGranted(permissionsGranted);
+			googleDTO.setBotName(botName);
+			googleDTO.setRestaurantId(restaurantId);
 			try {
 				 json = mapper.writeValueAsString(googleService.serveLex(googleDTO, context));			 
 				} catch (JsonProcessingException e) {
@@ -291,6 +328,8 @@ public class GoogleHomeOrchestration implements RequestStreamHandler {
 			googleDTO.setIntentName(intentName);
 			googleDTO.setFormattedAddress(formattedAddress);
 			googleDTO.setPermissionsGranted(permissionsGranted);
+			googleDTO.setBotName(botName);
+			googleDTO.setRestaurantId(restaurantId);
 			try {
 				 json = mapper.writeValueAsString(googleService.serveLex(googleDTO, context));			 
 				} catch (JsonProcessingException e) {
@@ -310,6 +349,28 @@ public class GoogleHomeOrchestration implements RequestStreamHandler {
 			googleDTO.setFormattedAddress(formattedAddress);
 			googleDTO.setPermissionsGranted(permissionsGranted);
 			googleDTO.setTransactionCheckResult(transactionCheckResult);
+			googleDTO.setBotName(botName);
+			googleDTO.setRestaurantId(restaurantId);
+			try {
+				 json = mapper.writeValueAsString(googleService.serveLex(googleDTO, context));			 
+				} catch (JsonProcessingException e) {
+					e.printStackTrace();
+				}
+				writer.write(googleService.serveLex(googleDTO, context));  
+		        writer.close();
+				return;
+		} else if (intentName.equalsIgnoreCase("TransactionsConfirmationDecision")) {
+			String transactionCheckResult = (String)resultcheck.get("originalRequest").get("data").get("inputs").get(0).get("arguments").get(0).get("extension").get("resultType");
+			GoogleTransactionsConfirmationDecision googleService = new GoogleTransactionsConfirmationDecision();
+			GoogleDTO googleDTO = new GoogleDTO();
+			googleDTO.setUserId(userId);
+			googleDTO.setRequest(request);
+			googleDTO.setIntentName(intentName);
+			googleDTO.setFormattedAddress(formattedAddress);
+			googleDTO.setPermissionsGranted(permissionsGranted);
+			googleDTO.setTransactionCheckResult(transactionCheckResult);
+			googleDTO.setBotName(botName);
+			googleDTO.setRestaurantId(restaurantId);
 			try {
 				 json = mapper.writeValueAsString(googleService.serveLex(googleDTO, context));			 
 				} catch (JsonProcessingException e) {

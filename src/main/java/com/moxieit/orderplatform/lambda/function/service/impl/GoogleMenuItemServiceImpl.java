@@ -26,6 +26,9 @@ import com.moxieit.orderplatform.function.service.api.AlexaDTO;
 import com.moxieit.orderplatform.function.service.api.GoogleDTO;
 import com.moxieit.orderplatform.lambda.response.BaseResponse;
 import com.moxieit.orderplatform.lambda.response.GoogleResponse;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 public class GoogleMenuItemServiceImpl extends AbstractGoogleOrderServiceImpl {
@@ -34,40 +37,59 @@ public class GoogleMenuItemServiceImpl extends AbstractGoogleOrderServiceImpl {
 	public BaseResponse serveLex(GoogleDTO googleDTO, Context context) {
 		// TODO Auto-generated method stub
 		DynamoDB dynamoDB = DBService.getDBConnection();
+		String botName = googleDTO.getBotName();
+		String restaurantId = googleDTO.getRestaurantId();
 		Table orderItemTable = dynamoDB.getTable("OrderItems");
 		Table menuItemsTable = dynamoDB.getTable("Menu_Items");
 		String itemPrice=null;
 		String categoryId=null;
 		String itemId=null;
 		String itemName=null;
-		Boolean isSpicy=null;		
+		Boolean isSpicy=null;	
+		 ArrayList<String> obj = new ArrayList<String>();
 		String MenuItemName = WordUtils.capitalize(googleDTO.getRequest());
 		System.out.println("my request of item name: "+MenuItemName);
 		try {
+			HashMap<String, Object> valueMap = new HashMap<String, Object>();
+			valueMap.put(":v_id", restaurantId);
+			valueMap.put(":letter1", restaurantId);
 			AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard().build();
 			
+		
+				
 			ScanRequest scanRequest = new ScanRequest()
 			    .withTableName("Menu_Items").withAttributesToGet("itemName","price","categoryId","itemId","isSpicy");
 			
-
 			ScanResult result = client.scan(scanRequest);
 		
 			for (Map<String, AttributeValue> item : result.getItems()){
-			   
-				String x = item.get("itemName").getS();
 				
+				
+				String x = item.get("itemName").getS();
+				String categoryid = item.get("categoryId").getS();
+								
 				 if(x.replaceAll("\\s+","").equalsIgnoreCase(MenuItemName.replaceAll("\\s+","")) ||
 						 MenuItemName.toLowerCase().replaceAll("\\s+","").contains(x.replaceAll("\\s+","").toLowerCase())){
-				
-					 itemName = item.get("itemName").getS().replaceAll("\\s+","");				
-						itemPrice=(String) item.get("price").getS();					
+					 System.out.println("my categoryid: "+categoryid);
+					 if(categoryid.startsWith(restaurantId)){
+						 						
+						 obj.add(item.get("itemName").getS().replaceAll("\\s+",""));
+					
+					// itemName = item.get("itemName").getS().replaceAll("\\s+","");				
+						itemPrice=(String) item.get("price").getN();					
 						categoryId=(String) item.get("categoryId").getS();					
 						itemId=(String) item.get("itemId").getS();						
 						isSpicy= (Boolean) item.get("isSpicy").getBOOL();
-					
+								
+						//break;
+					 }
 				 }
+				
 				 
 			}
+			  String longestString = getLongestString(obj);
+			  itemName = longestString;
+	
 			
 			/*ScanExpressionSpec xspec = new ExpressionSpecBuilder().withCondition(S("itemName").in(MenuItemName))
 					.buildForScan();
@@ -94,7 +116,9 @@ public class GoogleMenuItemServiceImpl extends AbstractGoogleOrderServiceImpl {
 				isSpicy= (Boolean) menuItem.get("isSpicy");
 				
 			}*/
+			
 			Item order = getOrder(googleDTO.getUserId());
+			System.out.println("order: "+order);
 			String orderuuid = order.getString("uuid");
 			System.out.println("1st order: "+order);
 			String uuid = UUID.randomUUID().toString();
@@ -106,7 +130,7 @@ public class GoogleMenuItemServiceImpl extends AbstractGoogleOrderServiceImpl {
 			orderItemTable.putItem(orderItem);
 			GoogleResponse googleResponse = new GoogleResponse();
 			googleResponse.setSpeech("How much quantity do you want for this order.");	
-			
+			System.out.println("How much quantity do you want for this order.");
 			return googleResponse;
 		} catch (Exception e){
 			StringBuilder BODY = new StringBuilder();
@@ -136,12 +160,25 @@ public class GoogleMenuItemServiceImpl extends AbstractGoogleOrderServiceImpl {
 	
 	}
 
+	public static String getLongestString(ArrayList<String> array) {
+	      int maxLength = 0;
+	      String longestString = null;
+	      for (String s : array) {
+	          if (s.length() > maxLength) {
+	              maxLength = s.length();
+	              longestString = s;
+	          }
+	      }
+	      return longestString;
+	  }
 
 	public static void main(String[] args) {
 		GoogleMenuItemServiceImpl googleService = new GoogleMenuItemServiceImpl();
 		GoogleDTO googleDTO = new GoogleDTO();
 		googleDTO.setUserId("ABwppHHu5052upleEQrsWad_QHD4CayzF4mk24Gu1Pd3Dxn4JVd7jBSiTi3CXE7k00B7huIZJqu3QIwPAMiIh44b6Q");
-		googleDTO.setRequest("i want goat curry");;
+		googleDTO.setRequest("order garlic naan");
+		googleDTO.setRestaurantId("23");
+		googleDTO.setBotName("SITARA");
 		Context context = null ;
 		googleService.serveLex(googleDTO, context);
 		}

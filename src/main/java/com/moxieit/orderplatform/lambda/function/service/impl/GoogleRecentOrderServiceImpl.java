@@ -36,10 +36,13 @@ public class GoogleRecentOrderServiceImpl implements GoogleService{
 	String categoryId= "";
 	String itemId= "";
 	boolean isSpicy;
+	String totalBillWithTax="";
 	@Override
 	public BaseResponse serveLex(GoogleDTO googleDTO, Context context) {
 		// TODO Auto-generated method stub
 		try{
+			String botName = googleDTO.getBotName();
+			String restaurantId = googleDTO.getRestaurantId();
 		String userId = googleDTO.getUserId();
 		DynamoDB dynamoDB = DBService.getDBConnection();
 		Table orderTable = dynamoDB.getTable("Order");			 
@@ -87,6 +90,7 @@ public class GoogleRecentOrderServiceImpl implements GoogleService{
 		String latestDate = formatter.format(latest);
 		System.out.println("latest date :"+latestDate);		
 		Table orderItemsTable = dynamoDB.getTable("OrderItems");
+
 		ScanExpressionSpec xspec3 = new ExpressionSpecBuilder().withCondition(S("userId").eq(userId)
 				.and(S("orderFrom").eq("GoogleHome")).and(S("orderDate").eq(latestDate)))
 				.buildForScan();
@@ -97,7 +101,8 @@ public class GoogleRecentOrderServiceImpl implements GoogleService{
 			public void accept(Item t2) {
 				Object order1 = t2.getString("uuid");
 				Item itemuuid = orderTable.getItem("uuid", order1);
-				String orderuuid1 = itemuuid.getString("uuid");				
+				String orderuuid1 = itemuuid.getString("uuid");	
+				totalBillWithTax = itemuuid.getString("totalBillWithTax");	
 				orderuuid = orderuuid1;		
 						
 
@@ -124,10 +129,11 @@ public class GoogleRecentOrderServiceImpl implements GoogleService{
 				itemId = t3.getString("menuItemId");
 				isSpicy = t3.getBoolean("isSpicy");
 				
-			BODY.append("Your Recent order is ").append(menuItem.getString("itemName"))
+			BODY.append(menuItem.getString("itemName"))
 			.append(",Quantity ")
-			.append(t3.getString("quantity")).append(",Total cost is ")
-			.append(t3.getString("itemCost")).append(" Dollars");			
+			.append(t3.getString("quantity"))
+			/*.append(",Total cost is ")
+			.append(t3.getString("itemCost")).append(" Dollars")*/;			
 
 
 			}
@@ -137,30 +143,9 @@ public class GoogleRecentOrderServiceImpl implements GoogleService{
 		System.out.println(BODY);
 		String itemsbody = BODY.toString();
 		
-		String uuid = UUID.randomUUID().toString();
-		String orderuuid = UUID.randomUUID().toString();
-		Item orderItem = new Item();
-		orderItem.withString("uuid", uuid).withString("orderuuid", orderuuid).withString("itemName", itemName)
-		.withNumber("creationDate", System.currentTimeMillis()).withString("categoryId", categoryId).withString("menuItemId", itemId)	
-		.withString("userId", googleDTO.getUserId()).withString("itemCost", itemCost).withBoolean("isSpicy", isSpicy)
-		.withString("itemQuantityAdd", "true");
-		orderItemsTable.putItem(orderItem);
-		System.out.println(orderItem);
-		Calendar calendar1 = Calendar.getInstance();
-		String date = formatter.format(calendar1.getTime());
-		
-		Item order = new Item();
-		order.withString("uuid", orderuuid).withString("userId", googleDTO.getUserId()).withString("orderStatus", "Initiated")
-				.withNumber("creationDate", System.currentTimeMillis()).withNumber("totalBill", 0)
-				.withNumber("tax", 0).withNumber("totalBillWithTax", 0).withString("orderTracking", "ACCEPTED")
-				.withString("orderDate", date).withString("returnMessage", "true")
-				.withString("paymentDone", "false").withString("orderFrom","GoogleHome")
-				.withString("restaurantId","1").withString("botName", "Test");
 			
-		orderTable.putItem(order);
-		System.out.println(order);
 		GoogleResponse googleResponse = new GoogleResponse();
-		googleResponse.setSpeech(""+itemsbody +" ,to confirm order speak Confirm, if not tell your item name or speak menu.");
+		googleResponse.setSpeech("Your Recent order is "+itemsbody +"and Total cost "+totalBillWithTax+ " dollars ,to confirm order speak Confirm, if not tell your item name or speak menu.");
 		System.out.println(googleResponse);
 		return googleResponse;
 		} catch (Exception e) {

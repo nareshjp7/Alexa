@@ -28,7 +28,7 @@ public class AlexaMenuCategoriesServiceImpl implements AlexaService{
 		StringBuilder menuCategory = new StringBuilder();
 		DynamoDB dynamoDB = DBService.getDBConnection();
 		Table menuCategoriesTable = dynamoDB.getTable("Menu_Categories");
-		String restaurantId = "1";
+		String restaurantId = alexaDTO.getRestaurantId();;
 		
 		HashMap<String, Object> valueMap = new HashMap<String, Object>();
 		valueMap.put(":v_id", restaurantId);

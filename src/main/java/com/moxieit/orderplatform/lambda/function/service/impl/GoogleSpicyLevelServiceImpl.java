@@ -43,8 +43,7 @@ public class GoogleSpicyLevelServiceImpl implements GoogleService{
 		
 		List<Date> dates = new ArrayList<Date>();
 		Calendar calendar = Calendar.getInstance();
-		DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-		DateFormat formatter1 = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+		
 		ScanExpressionSpec xspec1 = new ExpressionSpecBuilder().withCondition(S("userId").eq(googleDTO.getUserId())
 				.and(N("creationDate").ge(System.currentTimeMillis() - 900000)).and(S("itemQuantityAdd").eq("false")))
 				.buildForScan();
@@ -61,16 +60,14 @@ public class GoogleSpicyLevelServiceImpl implements GoogleService{
 			Date recentDate = null;		
 				//recentDate = (Date) formatter1.parse(orderDate);
 				recentDate = (Date) calendar.getTime();				
-				System.out.println("recentDate date :"+recentDate);			
 			dates.add(recentDate);
-			System.out.println("dates date :"+dates);
+			
 
 			}
 
 		};
 		scan1.forEach(action1);
-		Date latest = Collections.max(dates);
-		System.out.println("latest date :"+latest);
+		Date latest = Collections.max(dates);		
 		long itemdateMilliSec = latest.getTime();
 		System.out.println("itemdateMilliSec date :"+itemdateMilliSec);
 		
@@ -92,11 +89,7 @@ public class GoogleSpicyLevelServiceImpl implements GoogleService{
 					.withValueMap(new ValueMap().withString(":val", googleDTO.getRequest()).withString(":add", "true"));
 			UpdateItemOutcome outcome = orderItemTable.updateItem(updateItemSpec);
 			outcome.getItem();
-			UpdateItemSpec updateItemSpec2 = new UpdateItemSpec().withPrimaryKey("uuid", order.getString("orderuuid"))
-					.withUpdateExpression("set paymentDone =:pd")
-					.withValueMap(new ValueMap().withString(":pd", "true"));
-			UpdateItemOutcome outcome2 = orderTable.updateItem(updateItemSpec2);
-			outcome2.getItem();
+		
 			GoogleResponse googleResponse = new GoogleResponse();
 			googleResponse.setSpeech("If you want to add More Items speak Menu or itemname, otherwise confirm this Order for delivery or Pickup.");
 			return googleResponse;

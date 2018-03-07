@@ -23,6 +23,7 @@ import com.amazonaws.services.dynamodbv2.xspec.ExpressionSpecBuilder;
 import com.amazonaws.services.dynamodbv2.xspec.ScanExpressionSpec;
 import com.moxieit.orderplatform.DB.DBService;
 import com.moxieit.orderplatform.function.service.api.AlexaService;
+import com.moxieit.orderplatform.function.service.api.GoogleDTO;
 import com.moxieit.orderplatform.function.service.api.GoogleService;
 
 
@@ -32,6 +33,9 @@ public abstract class AbstractGoogleOrderServiceImpl implements GoogleService {
 	static Table orderTable = dynamoDB.getTable("Order");
 
 	protected Item getOrder(String userId) {
+		GoogleDTO googleDTO = new GoogleDTO();
+		String botName = googleDTO.getBotName();
+		String restaurantId = googleDTO.getRestaurantId();
 		List<String> orderStatuses = new ArrayList<>();
 		DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 
@@ -66,8 +70,8 @@ public abstract class AbstractGoogleOrderServiceImpl implements GoogleService {
 					.withNumber("creationDate", System.currentTimeMillis()).withNumber("totalBill", 0)
 					.withNumber("tax", 0).withNumber("totalBillWithTax", 0).withString("orderTracking", "ACCEPTED")
 					.withString("orderDate", date).withString("returnMessage", "true")
-					.withString("paymentDone", "true").withString("orderFrom","GoogleHome")
-					.withString("restaurantId","1").withString("botName", "moxieitwebsite");
+					.withString("paymentDone", "false").withString("orderFrom","GoogleHome")
+					.withString("restaurantId","23").withString("botName", "SITARA");
 				
 			orderTable.putItem(order);
 		}

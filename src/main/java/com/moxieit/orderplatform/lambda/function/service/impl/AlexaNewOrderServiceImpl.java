@@ -17,11 +17,7 @@ public class AlexaNewOrderServiceImpl implements AlexaService {
 		AlexaResponse alexaResponse = new AlexaResponse();
 		Response response = new Response();
 		OutputSpeech outputSpeech = new OutputSpeech();
-		/*
-		 * outputSpeech.setText(
-		 * "Today will provide you a new learning opportunity.  Stick with it and the possibilities will be endless. Can I help you with anything else?"
-		 * );
-		 */
+		
 		outputSpeech.setSsml("<speak>Great, Let's GetStarted. You can tell what would you like to order or I can tell you about my MENU, What would you like.</speak>");
 		outputSpeech.setType("SSML");
 		Card card = new Card();

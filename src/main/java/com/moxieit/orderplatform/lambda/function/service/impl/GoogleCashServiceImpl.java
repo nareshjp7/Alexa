@@ -80,17 +80,15 @@ public class GoogleCashServiceImpl {
     			calendar.setTimeInMillis(milliSeconds);		
     			Date recentDate = null;		
     				//recentDate = (Date) formatter1.parse(orderDate);
-    				recentDate = (Date) calendar.getTime();				
-    				System.out.println("recentDate date :"+recentDate);			
-    			dates.add(recentDate);
-    			System.out.println("dates date :"+dates);
+    				recentDate = (Date) calendar.getTime();		
+    			
+    			dates.add(recentDate);    		
 
     			}
 
     		};
     		scan.forEach(action);
-    		Date latest = Collections.max(dates);
-    		System.out.println("latest date :"+latest);
+    		Date latest = Collections.max(dates);    		
     		long itemdateMilliSec = latest.getTime();
     		System.out.println("itemdateMilliSec date :"+itemdateMilliSec);
     		
@@ -148,8 +146,8 @@ public class GoogleCashServiceImpl {
          
  
             String userOrder = googleDTO.getRequest();
-            if (userOrder.toLowerCase().replaceAll("\\s+","").contains("cash")){
-            	 responseJson.put("speech", "your order was confirmed. Your are ordered "+BODY+" and Total cost is "+totalBillWithTax+ " Dollars.");
+           // if (userOrder.toLowerCase().replaceAll("\\s+","").contains("cash")){
+            	 responseJson.put("speech", "your order was confirmed. You are ordered "+BODY+" and Total cost is "+totalBillWithTax+ " Dollars.");
             		
             		Table restaurantTable = dynamoDB.getTable("Restaurant");
             		
@@ -179,17 +177,15 @@ public class GoogleCashServiceImpl {
  					// TODO Auto-generated catch block
  					e.printStackTrace();
  				}
-     			sendSMSMessage(snsClient, snsmessage1, phoneNumcode, smsAttributes);
-            } 
-           
+     		
                      
             Table orderTable = dynamoDB.getTable("Order");
         	UpdateItemSpec updateItemSpec2 = new UpdateItemSpec().withPrimaryKey("uuid", orderuuid)
-					.withUpdateExpression("set orderStatus = :sta, paymentMethod = :pay")
-					.withValueMap(new ValueMap().withString(":sta", "ACCEPTED").withString(":pay", "Cash On Delivery"));					
+					.withUpdateExpression("set orderStatus = :sta, paymentMethod = :pay, paymentDone =:pd")
+					.withValueMap(new ValueMap().withString(":sta", "ACCEPTED").withString(":pay", "Cash On Delivery").withString(":pd", "true"));					
 			UpdateItemOutcome outcome2 = orderTable.updateItem(updateItemSpec2);
 			outcome2.getItem();	
-
+			sendSMSMessage(snsClient, snsmessage1, phoneNumcode, smsAttributes);
         } catch(Exception pex) {
             responseJson.put("statusCode", "400");
             responseJson.put("exception", pex);

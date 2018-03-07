@@ -10,13 +10,12 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.moxieit.orderplatform.DB.DBService;
 import com.moxieit.orderplatform.function.service.api.AlexaDTO;
 import com.moxieit.orderplatform.function.service.api.AlexaService;
-import com.moxieit.orderplatform.lambda.function.service.impl.AlexaBiryaniServiceImpl;
+import com.moxieit.orderplatform.lambda.function.service.impl.AlexaCategoriesServiceImpl;
 import com.moxieit.orderplatform.lambda.function.service.impl.AlexaCancelServiceImpl;
 import com.moxieit.orderplatform.lambda.function.service.impl.AlexaMenuItemServiceImpl;
 import com.moxieit.orderplatform.lambda.function.service.impl.AlexaClosedOrderServiceImpl;
 import com.moxieit.orderplatform.lambda.function.service.impl.AlexaConfirmOrderServiceImpl;
 import com.moxieit.orderplatform.lambda.function.service.impl.AlexaDeliveryServiceImpl;
-import com.moxieit.orderplatform.lambda.function.service.impl.AlexaDesertItemQuantityServiceimpl;
 import com.moxieit.orderplatform.lambda.function.service.impl.AlexaRecentOrderServiceImpl;
 import com.moxieit.orderplatform.lambda.function.service.impl.AlexaGetStartedServiceImpl;
 import com.moxieit.orderplatform.lambda.function.service.impl.AlexaMenuCategoriesServiceImpl;
@@ -35,6 +34,8 @@ public class AlexaOrchestration implements RequestHandler<Object, BaseResponse> 
 		// LambdaLogger logger = context.getLogger();
 		System.out.println("Input :" + alexaRequest);
 		// logger.log("Input : " +lexRequest);
+		String botName = "SITARA";
+		String restaurantId = "23";
 		DynamoDB dynamoDB = DBService.getDBConnection();
 		Table restaurantTable = dynamoDB.getTable("Restaurant");
 		Map<String, Map<String, String>> map = new HashMap<String, Map<String, String>>();
@@ -108,6 +109,8 @@ public class AlexaOrchestration implements RequestHandler<Object, BaseResponse> 
 			alexaDTO.setLaunchRequest(LaunchRequest);
 			alexaDTO.setDeviceId(deviceId);
 			alexaDTO.setConsentToken(consentToken);
+			alexaDTO.setBotName(botName);
+			alexaDTO.setRestaurantId(restaurantId);
 			return alexaService.serveLex(alexaDTO, context);
 		} else if (intentName.contains("NewOrder")) {
 			AlexaService alexaService = new AlexaNewOrderServiceImpl();
@@ -115,6 +118,8 @@ public class AlexaOrchestration implements RequestHandler<Object, BaseResponse> 
 			alexaDTO.setApplicationId(applicationId);
 			alexaDTO.setUserId(alexaUserId);
 			alexaDTO.setRequest(request);
+			alexaDTO.setBotName(botName);
+			alexaDTO.setRestaurantId(restaurantId);
 			return alexaService.serveLex(alexaDTO, context);
 		} else if (intentName.equalsIgnoreCase("RecentOrder")) {
 			AlexaService alexaService = new AlexaRecentOrderServiceImpl();
@@ -124,6 +129,8 @@ public class AlexaOrchestration implements RequestHandler<Object, BaseResponse> 
 			alexaDTO.setRequest(request);
 			alexaDTO.setDeviceId(deviceId);
 			alexaDTO.setConsentToken(consentToken);
+			alexaDTO.setBotName(botName);
+			alexaDTO.setRestaurantId(restaurantId);
 			return alexaService.serveLex(alexaDTO, context);
 		} else if (intentName.equalsIgnoreCase("Delivery")) {
 			AlexaService alexaService = new AlexaDeliveryServiceImpl();
@@ -133,6 +140,8 @@ public class AlexaOrchestration implements RequestHandler<Object, BaseResponse> 
 			alexaDTO.setRequest(request);
 			alexaDTO.setDeviceId(deviceId);
 			alexaDTO.setConsentToken(consentToken);
+			alexaDTO.setBotName(botName);
+			alexaDTO.setRestaurantId(restaurantId);
 			return alexaService.serveLex(alexaDTO, context);
 		} else if (intentName.equalsIgnoreCase("PickUp")) {
 			AlexaService alexaService = new AlexaPickUpServiceImpl();
@@ -140,6 +149,8 @@ public class AlexaOrchestration implements RequestHandler<Object, BaseResponse> 
 			alexaDTO.setApplicationId(applicationId);
 			alexaDTO.setUserId(alexaUserId);
 			alexaDTO.setRequest(request);
+			alexaDTO.setBotName(botName);
+			alexaDTO.setRestaurantId(restaurantId);
 			return alexaService.serveLex(alexaDTO, context);
 		
 		} else if (intentName.equalsIgnoreCase("Menu")) {
@@ -148,16 +159,19 @@ public class AlexaOrchestration implements RequestHandler<Object, BaseResponse> 
 			alexaDTO.setApplicationId(applicationId);
 			alexaDTO.setUserId(alexaUserId);
 			alexaDTO.setRequest(request);
+			alexaDTO.setBotName(botName);
+			alexaDTO.setRestaurantId(restaurantId);
 			return alexaService.serveLex(alexaDTO, context);
 		
-		} else if (intentName.equalsIgnoreCase("Biryani") || intentName.equalsIgnoreCase("SideOrders")  
-				|| intentName.equalsIgnoreCase("Desserts") || intentName.equalsIgnoreCase("MainCourse")) {
-			AlexaService alexaService = new AlexaBiryaniServiceImpl();
+		} else if (intentName.equalsIgnoreCase("MenuCategory")) {
+			AlexaService alexaService = new AlexaCategoriesServiceImpl();
 			AlexaDTO alexaDTO = new AlexaDTO();
 			alexaDTO.setApplicationId(applicationId);
 			alexaDTO.setUserId(alexaUserId);
 			alexaDTO.setRequest(request);
 			alexaDTO.setIntentName(intentName);
+			alexaDTO.setBotName(botName);
+			alexaDTO.setRestaurantId(restaurantId);
 			return alexaService.serveLex(alexaDTO, context);
 		
 		} else if (intentName.equalsIgnoreCase("MenuItem")) {
@@ -166,15 +180,10 @@ public class AlexaOrchestration implements RequestHandler<Object, BaseResponse> 
 			alexaDTO.setApplicationId(applicationId);
 			alexaDTO.setUserId(alexaUserId);
 			alexaDTO.setRequest(request);
+			alexaDTO.setBotName(botName);
+			alexaDTO.setRestaurantId(restaurantId);
 			return alexaService.serveLex(alexaDTO, context);
 		
-		} else if (request.equalsIgnoreCase("DessertsItems")) {
-			AlexaService alexaService = new AlexaDesertItemQuantityServiceimpl();
-			AlexaDTO alexaDTO = new AlexaDTO();
-			alexaDTO.setApplicationId(applicationId);
-			alexaDTO.setUserId(alexaUserId);
-			alexaDTO.setRequest(request);
-			return alexaService.serveLex(alexaDTO, context);
 		
 		} else if (intentName.equalsIgnoreCase("Quantity")) {
 			AlexaService alexaService = new AlexaQuantityServiceImpl();
@@ -184,6 +193,8 @@ public class AlexaOrchestration implements RequestHandler<Object, BaseResponse> 
 			alexaDTO.setRequest(request2);
 			alexaDTO.setDeviceId(deviceId);
 			alexaDTO.setConsentToken(consentToken);
+			alexaDTO.setBotName(botName);
+			alexaDTO.setRestaurantId(restaurantId);
 			return alexaService.serveLex(alexaDTO, context);
 		
 		} else if (intentName.equalsIgnoreCase("SpicyLevel")) {
@@ -192,6 +203,8 @@ public class AlexaOrchestration implements RequestHandler<Object, BaseResponse> 
 			alexaDTO.setApplicationId(applicationId);
 			alexaDTO.setUserId(alexaUserId);
 			alexaDTO.setRequest(request);
+			alexaDTO.setBotName(botName);
+			alexaDTO.setRestaurantId(restaurantId);
 			return alexaService.serveLex(alexaDTO, context);
 		/*} else if (request.equalsIgnoreCase("SpicyLevel") || request.equalsIgnoreCase("DessertsItemsQuantity")) {
 			AlexaService alexaService = new AlexaClosedOrderServiceImpl();
@@ -208,6 +221,8 @@ public class AlexaOrchestration implements RequestHandler<Object, BaseResponse> 
 			alexaDTO.setUserId(alexaUserId);
 			alexaDTO.setRequest(request);
 			alexaDTO.setIntentName(intentName);
+			alexaDTO.setBotName(botName);
+			alexaDTO.setRestaurantId(restaurantId);
 			return alexaService.serveLex(alexaDTO, context);
 		}else if (intentName.equalsIgnoreCase("CheckOut")) {
 			AlexaService alexaService = new AlexaClosedOrderServiceImpl();
@@ -215,6 +230,8 @@ public class AlexaOrchestration implements RequestHandler<Object, BaseResponse> 
 			alexaDTO.setApplicationId(applicationId);
 			alexaDTO.setUserId(alexaUserId);
 			alexaDTO.setRequest(request);
+			alexaDTO.setBotName(botName);
+			alexaDTO.setRestaurantId(restaurantId);
 			return alexaService.serveLex(alexaDTO, context);
 		} else if (intentName.equalsIgnoreCase("Confirm")) {
 			AlexaService alexaService = new AlexaConfirmOrderServiceImpl();
@@ -222,6 +239,8 @@ public class AlexaOrchestration implements RequestHandler<Object, BaseResponse> 
 			alexaDTO.setApplicationId(applicationId);
 			alexaDTO.setUserId(alexaUserId);
 			alexaDTO.setRequest(request);
+			alexaDTO.setBotName(botName);
+			alexaDTO.setRestaurantId(restaurantId);
 			return alexaService.serveLex(alexaDTO, context);
 		}
 		

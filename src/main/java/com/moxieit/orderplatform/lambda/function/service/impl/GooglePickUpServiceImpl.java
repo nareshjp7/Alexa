@@ -42,8 +42,7 @@ public class GooglePickUpServiceImpl implements GoogleService{
 		
 		List<Date> dates = new ArrayList<Date>();
 		Calendar calendar = Calendar.getInstance();
-		DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-		DateFormat formatter1 = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+		
 		ScanExpressionSpec xspec1 = new ExpressionSpecBuilder().withCondition(S("userId").eq(googleDTO.getUserId())
 				.and(N("creationDate").ge(System.currentTimeMillis() - 900000)).and(S("itemQuantityAdd").eq("true")))
 				.buildForScan();
@@ -60,16 +59,15 @@ public class GooglePickUpServiceImpl implements GoogleService{
 			Date recentDate = null;		
 				//recentDate = (Date) formatter1.parse(orderDate);
 				recentDate = (Date) calendar.getTime();				
-				System.out.println("recentDate date :"+recentDate);			
+						
 			dates.add(recentDate);
-			System.out.println("dates date :"+dates);
+		
 
 			}
 
 		};
 		scan1.forEach(action1);
-		Date latest = Collections.max(dates);
-		System.out.println("latest date :"+latest);
+		Date latest = Collections.max(dates);	
 		long itemdateMilliSec = latest.getTime();
 		System.out.println("itemdateMilliSec date :"+itemdateMilliSec);
 		

@@ -11,6 +11,8 @@ public class GoogleDTO {
 	private String permissionsGranted;
 	private String quantityValue;
 	private String TransactionCheckResult;
+	private String botName;
+	private String restaurantId;
 
 
 
@@ -76,6 +78,22 @@ public class GoogleDTO {
 
 	public void setTransactionCheckResult(String transactionCheckResult) {
 		TransactionCheckResult = transactionCheckResult;
+	}
+
+	public String getBotName() {
+		return botName;
+	}
+
+	public void setBotName(String botName) {
+		this.botName = botName;
+	}
+
+	public String getRestaurantId() {
+		return restaurantId;
+	}
+
+	public void setRestaurantId(String restaurantId) {
+		this.restaurantId = restaurantId;
 	}
 
 	

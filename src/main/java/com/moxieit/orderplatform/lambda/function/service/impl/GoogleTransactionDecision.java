@@ -69,14 +69,16 @@ public class GoogleTransactionDecision {
         JSONObject customerInfoOptions = new JSONObject();
         JSONObject customerInfoProperties = new JSONObject();
         JSONObject google = new JSONObject();
-        JSONObject proposedOrder = new JSONObject();
-        JSONObject proposedOrder1 = new JSONObject();
+        JSONObject proposedOrder = new JSONObject();     
+        JSONObject finalproposedOrder = new JSONObject();
+        JSONObject merchant = new JSONObject();
     	ObjectMapper mapper = new ObjectMapper();
     	
        
     	JSONObject cart = new JSONObject(); 
     	JSONObject lineItems = new JSONObject(); 
-    	JSONObject lineItems1 = new JSONObject(); 
+    	JSONObject lineItems1 = new JSONObject();
+    	JSONObject otherItem = new JSONObject(); 
     	
     	
     	
@@ -128,17 +130,14 @@ public class GoogleTransactionDecision {
 			calendar.setTimeInMillis(milliSeconds);		
 			Date recentDate = null;		
 				//recentDate = (Date) formatter1.parse(orderDate);
-				recentDate = (Date) calendar.getTime();				
-				System.out.println("recentDate date :"+recentDate);			
+				recentDate = (Date) calendar.getTime();		
 			dates.add(recentDate);
-			System.out.println("dates date :"+dates);
-
+		
 			}
 
 		};
 		scan.forEach(action);
-		Date latest = Collections.max(dates);
-		System.out.println("latest date :"+latest);
+		Date latest = Collections.max(dates);	
 		long itemdateMilliSec = latest.getTime();
 		System.out.println("itemdateMilliSec date :"+itemdateMilliSec);
 		
@@ -155,7 +154,7 @@ public class GoogleTransactionDecision {
 		System.out.println("firstPage :"+firstPage);
 		if (firstPage.iterator().hasNext()) {
 			order = firstPage.iterator().next();
-			System.out.println("order :"+order);				
+			System.out.println("order :"+order);		
 		
 			Item ordertableuuid = orderTable.getItem("uuid", order.getString("orderuuid"));
 			orderuuid = ordertableuuid.getString("uuid");
@@ -169,8 +168,7 @@ public class GoogleTransactionDecision {
 			 
 		 
 	      ArrayList<Object> obj = new ArrayList<Object>();
-	    	JSONObject newobj = new JSONObject();
-	    	Data object1;
+	    	
 	    	 ScanExpressionSpec xspec4 = new ExpressionSpecBuilder().withCondition(S("orderuuid").eq(orderuuid).and(S("itemQuantityAdd").eq("true")))
 				.buildForScan();
 		ItemCollection<ScanOutcome> scan4 = orderItemTable.scan(xspec4);
@@ -197,11 +195,10 @@ public class GoogleTransactionDecision {
 		
 		Double taxper = .06;
 		Double tax = Double.parseDouble(price) * taxper.doubleValue();
-		//Double totalValueWithTax =  Double.parseDouble(price) + tax;
 		Double totalValueWithTax =  Double.parseDouble(price) + tax;
-		 System.out.println("totalValueWithTax "+totalValueWithTax);
-		 
-		 double d = totalValueWithTax;
+	
+		// double d = totalValueWithTax;
+		 double d =  Double.parseDouble(price);
 		 int units = (int) d;
 		 double nanos = d - (long) d;
 		 
@@ -212,7 +209,7 @@ public class GoogleTransactionDecision {
 		   // round to 2 digits:
 		   nf.setMaximumFractionDigits(9);
 					   
-		   double nano1 = Double.parseDouble(nf.format(nanos)) * 100;
+		   double nano1 = Double.parseDouble(nf.format(nanos)) * 1000000000;
 		   int nano = (int) nano1;
 		   System.out.println("nano value "+nano);
 		   System.out.println("units value "+units);
@@ -237,7 +234,6 @@ public class GoogleTransactionDecision {
 		newobj.put("id", orderuuid);
 		newobj.put("type",type.REGULAR);
 		
-		   System.out.println("name name" +name);
 				i++;
 				obj.add(newobj);
 			/*BODY.append(menuItem.getString("itemName"))
@@ -250,57 +246,88 @@ public class GoogleTransactionDecision {
 
 		};
 		scan4.forEach(action4);
-    	    	
-		   System.out.println("items obj" +obj);
+    
+    	 ArrayList<Object> otherItems = new ArrayList<Object>();
+    	 
+    	 double totalBillvalue =  Double.parseDouble(totalBill);
+    	 int totalunits = (int) totalBillvalue;
+		 double totalnanos = totalBillvalue - (long) totalBillvalue;
+		 
+		 Locale locale = Locale.ENGLISH;
+		   NumberFormat nf = NumberFormat.getNumberInstance(locale);
+		   // for trailing zeros:
+		   nf.setMinimumFractionDigits(9);
+		   // round to 2 digits:
+		   nf.setMaximumFractionDigits(9);
+					   
+		   double totalnano1 = Double.parseDouble(nf.format(totalnanos)) * 1000000000;
+		   int totalnano = (int) totalnano1;
 		   
-		  
-			 
-			 double d = Double.parseDouble((String) totalBill);
-			 int units = (int) d;
-			 
-			/* double nanos = d - (long) d;
-			 
-			 Locale locale = Locale.ENGLISH;
-			   NumberFormat nf = NumberFormat.getNumberInstance(locale);
-			   // for trailing zeros:
-			   nf.setMinimumFractionDigits(9);
-			   // round to 2 digits:
-			   nf.setMaximumFractionDigits(9);
-						   
-			   double nano1 = Double.parseDouble(nf.format(nanos)) * 100;
-			   int nano = (int) nano1;*/
-			 
-			 double nanos = Double.parseDouble(tax) * 100;
-			   System.out.println("y "+ nanos);
-						 
-		   JSONObject price = new JSONObject();
+		   JSONObject otherItemsPrice = new JSONObject(); 
 	    	JSONObject amount = new JSONObject();
 	    	amount.put("currencyCode","USD");
-	    	amount.put("units", units);
-	    	amount.put("nanos", nanos);
-	    	price.put("type",priceType.ACTUAL);
-	    	price.put("amount",amount);
+	    	amount.put("units", totalunits);
+	    	amount.put("nanos", totalnano);
+	    	otherItemsPrice.put("type",priceType.ESTIMATE);
+	    	otherItemsPrice.put("amount",amount);
+    	 JSONObject otherItems1 = new JSONObject();
+    	 otherItems1.put("name", "Subtotal");
+    	 otherItems1.put("price", otherItemsPrice);    	   		
+    	 otherItems1.put("type",type.SUBTOTAL);
+    	 
+    	 double totaltaxvalue =  Double.parseDouble(tax);
+    	 int totaltaxunits = (int) totaltaxvalue;
+		 double totaltaxnanos = totaltaxvalue - (long) totaltaxvalue;
+						   
+		   double totaltaxnano1 = Double.parseDouble(nf.format(totaltaxnanos)) * 1000000000;
+		   int totaltaxnano = (int) totaltaxnano1;
 		   
-    	/*lineItems.put("id", orderuuid);
-    	lineItems.put("type",type.REGULAR);
-    	lineItems.put("image",image);
-    	lineItems.put("name","eg Dum Biryani");
-    	lineItems.put("price",price);
-    	lineItems.put("quantity","2");*/
+		   JSONObject otherItemsPrice2 = new JSONObject(); 
+	    	JSONObject amount2 = new JSONObject();
+	    	amount2.put("currencyCode","USD");
+	    	amount2.put("units", totaltaxunits);
+	    	amount2.put("nanos", totaltaxnano);
+	    	otherItemsPrice2.put("type",priceType.ESTIMATE);
+	    	otherItemsPrice2.put("amount",amount2);
+    	 JSONObject otherItems2 = new JSONObject();
+    	 otherItems2.put("name", "Subtotal");
+    	 otherItems2.put("price", otherItemsPrice2);       		
+    	 otherItems2.put("type",type.TAX);
+    	 
+    	 otherItems.add(otherItems1);
+    	 otherItems.add(otherItems2);
+		
+			 
+			 double d = Double.parseDouble((String) totalBillWithTax);
+			 int units = (int) d;
+			 double nanos = d - (long) d;
+			 
+								   
+			   double nano1 = Double.parseDouble(nf.format(nanos)) * 1000000000;
+			   int nano = (int) nano1;
+			  	// double nanos = Double.parseDouble(tax) * 100;
+						 
+		   JSONObject price = new JSONObject();
+	    	JSONObject finalamount = new JSONObject();
+	    	finalamount.put("currencyCode","USD");
+	    	finalamount.put("units", units);
+	    	finalamount.put("nanos", nano);
+	    	price.put("type",priceType.ACTUAL);
+	    	price.put("amount",finalamount);
+		   
     
-	
-      
-        
         ArrayList<String> customerInfoProperties1 = new ArrayList<String>();
         customerInfoProperties1.add("EMAIL");
       String result = googleDTO.getTransactionCheckResult();
-      System.out.println("result" +result);
-  if (result.equals("OK")){
+     if (result.equals("OK")){
 
         try {
-        	lineItems1.put("lineItems", obj);
-        	proposedOrder1.put("cart", lineItems1);
-        	proposedOrder1.put("totalPrice", price);
+        	merchant.put("name", "Sitara Indian Cuisine");
+        	proposedOrder.put("otherItems", otherItems);
+        	proposedOrder.put("lineItems", obj);
+        	proposedOrder.put("merchant", merchant);
+        	finalproposedOrder.put("cart", proposedOrder);        	
+        	finalproposedOrder.put("totalPrice", price);
         	parameters.put("gateway", "stripe"); 
         	parameters.put("stripe:publishableKey", "pk_test_V7nawTDc9yKNRCEUEF3eMARZ"); 
         	parameters.put("stripe:version", "2017-05-25"); 
@@ -309,7 +336,7 @@ public class GoogleTransactionDecision {
         	orderOptions.put("requestDeliveryAddress", false);
         	tokenizationParameters1.put("tokenizationParameters", tokenizationParameters);
             data.put("@type", "type.googleapis.com/google.actions.v2.TransactionDecisionValueSpec");
-            data.put("proposedOrder", proposedOrder1);
+            data.put("proposedOrder", finalproposedOrder);
             customerInfoProperties.put("customerInfoProperties", customerInfoProperties1);
             customerInfoOptions.put("customerInfoOptions", customerInfoProperties); 
             data.put("orderOptions", customerInfoOptions); 

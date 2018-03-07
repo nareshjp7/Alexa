@@ -63,7 +63,7 @@ public class GoogleTransactionRequirementsCheckServiceImpl {
         obj.add("AMEX");
         obj.add("DISCOVER");
         obj.add("MASTERCARD");
-        obj.add("JCB");
+       // obj.add("JCB");
         String orderuuid ="";
         String totalBillWithTax ="";
         String phoneNumcode = "";
@@ -205,7 +205,7 @@ public class GoogleTransactionRequirementsCheckServiceImpl {
                 responseJson1.put("systemIntent", systemIntent);
                 google.put("google", responseJson1);  
                 responseJson.put("data", google); 
-            	 responseJson.put("speech", BODY+", would you like to proceed to pay, or check your account balance?");
+            	 responseJson.put("speech", "your order is "+BODY+" and Total cost is "+totalBillWithTax+ " Dollars. would you like to proceed to pay, or check your account balance?");
             	
             }
            

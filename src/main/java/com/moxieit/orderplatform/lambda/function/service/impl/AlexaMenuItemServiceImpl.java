@@ -4,17 +4,25 @@ import static com.amazonaws.services.dynamodbv2.xspec.ExpressionSpecBuilder.N;
 import static com.amazonaws.services.dynamodbv2.xspec.ExpressionSpecBuilder.S;
 
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 
 import org.apache.commons.lang3.text.WordUtils;
 
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.ItemCollection;
 import com.amazonaws.services.dynamodbv2.document.Page;
 import com.amazonaws.services.dynamodbv2.document.ScanOutcome;
 import com.amazonaws.services.dynamodbv2.document.Table;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import com.amazonaws.services.dynamodbv2.model.ScanRequest;
+import com.amazonaws.services.dynamodbv2.model.ScanResult;
 import com.amazonaws.services.dynamodbv2.xspec.ExpressionSpecBuilder;
 import com.amazonaws.services.dynamodbv2.xspec.ScanExpressionSpec;
 import com.amazonaws.services.lambda.runtime.Context;
@@ -32,51 +40,60 @@ public class AlexaMenuItemServiceImpl extends AbstractAlexaOrderServiceImpl {
 	@Override
 	public BaseResponse serveLex(AlexaDTO alexaDTO, Context context) {
 		DynamoDB dynamoDB = DBService.getDBConnection();
+		String botName = alexaDTO.getBotName();
+		String restaurantId = alexaDTO.getRestaurantId();
 		Table orderItemTable = dynamoDB.getTable("OrderItems");
 		Table menuItemsTable = dynamoDB.getTable("Menu_Items");
 		String itemPrice=null;
 		String categoryId=null;
 		String itemId=null;
 		String itemName=null;
-		Boolean isSpicy=null;		
+		Boolean isSpicy=null;	
+		ArrayList<String> obj = new ArrayList<String>();
 		String MenuItemName = WordUtils.capitalize(alexaDTO.getRequest());
-		/*try{
-		ScanExpressionSpec xspec = new ExpressionSpecBuilder().withCondition(S("userId").eq(alexaDTO.getUserId())
-				.and(N("creationDate").ge(System.currentTimeMillis() - 900000)).and(S("itemQuantityAdd").eq("false")))
-				.buildForScan();
-		System.out.println(alexaDTO.getUserId());
-		ItemCollection<ScanOutcome> scan = orderItemTable.scan(xspec);
-		Item order = null;
-
-		Page<Item, ScanOutcome> firstPage = scan.firstPage();
-		System.out.println(firstPage);
-		if (firstPage.iterator().hasNext()) {
-			order = firstPage.iterator().next();
-			System.out.println("2nd order: "+order);
+		System.out.println("my request of item name: "+MenuItemName);
 			
-		}
-		} catch(Exception e1){
-			System.out.println("exception e1");
-		
-		}*/
-		
 		try {
-	
-		ScanExpressionSpec xspec = new ExpressionSpecBuilder().withCondition(S("itemName").eq(MenuItemName))
-				.buildForScan();
-
-		ItemCollection<ScanOutcome> scan = menuItemsTable.scan(xspec);
-		Item menuItem = null;
-		Page<Item, ScanOutcome> firstPage = scan.firstPage();		
-		if (firstPage.iterator().hasNext()) {
-			menuItem = firstPage.iterator().next();
-			itemPrice=(String) menuItem.get("price");
-			categoryId=(String) menuItem.get("categoryId");
-			itemId=(String) menuItem.get("itemId");
-			itemName=(String) menuItem.get("itemName");
-			isSpicy= (Boolean) menuItem.get("isSpicy");
+			HashMap<String, Object> valueMap = new HashMap<String, Object>();
+			valueMap.put(":v_id", restaurantId);
+			valueMap.put(":letter1", restaurantId);
+			AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard().build();
 			
-		}
+		
+				
+			ScanRequest scanRequest = new ScanRequest()
+			    .withTableName("Menu_Items").withAttributesToGet("itemName","price","categoryId","itemId","isSpicy");
+			
+			ScanResult result = client.scan(scanRequest);
+		
+			for (Map<String, AttributeValue> item : result.getItems()){
+				
+				
+				String x = item.get("itemName").getS();
+				String categoryid = item.get("categoryId").getS();
+								
+				 if(x.replaceAll("\\s+","").equalsIgnoreCase(MenuItemName.replaceAll("\\s+","")) ||
+						 MenuItemName.toLowerCase().replaceAll("\\s+","").contains(x.replaceAll("\\s+","").toLowerCase())){
+					 System.out.println("my categoryid: "+categoryid);
+					 if(categoryid.startsWith(restaurantId)){
+						 						
+						 obj.add(item.get("itemName").getS().replaceAll("\\s+",""));
+					
+					// itemName = item.get("itemName").getS().replaceAll("\\s+","");				
+						itemPrice=(String) item.get("price").getN();					
+						categoryId=(String) item.get("categoryId").getS();					
+						itemId=(String) item.get("itemId").getS();						
+						isSpicy= (Boolean) item.get("isSpicy").getBOOL();
+								
+						//break;
+					 }
+				 }
+				
+				 
+			}
+			  String longestString = getLongestString(obj);
+			  itemName = longestString;
+		
 		Item order = getOrder(alexaDTO.getUserId());
 		String orderuuid = order.getString("uuid");
 		System.out.println("1st order: "+order);
@@ -84,7 +101,7 @@ public class AlexaMenuItemServiceImpl extends AbstractAlexaOrderServiceImpl {
 		Item orderItem = new Item();
 		orderItem.withString("uuid", uuid).withString("orderuuid", orderuuid).withString("itemName", itemName)
 		.withNumber("creationDate", System.currentTimeMillis()).withString("categoryId", categoryId).withString("menuItemId", itemId)	
-		.withString("userId", alexaDTO.getUserId()).withString("itemCost", itemPrice).withBoolean("isSpicy", isSpicy)
+		.withString("userId", alexaDTO.getUserId()).withNumber("quantity", 0).withString("itemCost", itemPrice).withBoolean("isSpicy", isSpicy)
 		.withString("itemQuantityAdd", "false");
 		orderItemTable.putItem(orderItem);
 		AlexaResponse alexaResponse = new AlexaResponse();
@@ -158,11 +175,18 @@ public class AlexaMenuItemServiceImpl extends AbstractAlexaOrderServiceImpl {
 		}
 
 	
-
-		
-		
-
 	}
+	public static String getLongestString(ArrayList<String> array) {
+	      int maxLength = 0;
+	      String longestString = null;
+	      for (String s : array) {
+	          if (s.length() > maxLength) {
+	              maxLength = s.length();
+	              longestString = s;
+	          }
+	      }
+	      return longestString;
+	  }
 
 public static void main(String[] args) {
 		AlexaMenuItemServiceImpl alexaChikuItemServiceImpl=new AlexaMenuItemServiceImpl();

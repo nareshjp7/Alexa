@@ -45,7 +45,7 @@ public class AlexaRecentOrderServiceImpl implements AlexaService {
 	String categoryId= "";
 	String itemId= "";
 	boolean isSpicy;
-	
+	String totalBillWithTax="";
 	@Override
 	public BaseResponse serveLex(AlexaDTO alexaDTO, Context context) {
 		try{

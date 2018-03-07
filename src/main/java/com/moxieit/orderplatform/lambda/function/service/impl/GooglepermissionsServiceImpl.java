@@ -43,8 +43,7 @@ public class GooglepermissionsServiceImpl implements GoogleService{
 		
 		List<Date> dates = new ArrayList<Date>();
 		Calendar calendar = Calendar.getInstance();
-		DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-		DateFormat formatter1 = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+	
 		ScanExpressionSpec xspec1 = new ExpressionSpecBuilder().withCondition(S("userId").eq(googleDTO.getUserId())
 				.and(N("creationDate").ge(System.currentTimeMillis() - 900000)).and(S("itemQuantityAdd").eq("true")))
 				.buildForScan();
@@ -60,22 +59,23 @@ public class GooglepermissionsServiceImpl implements GoogleService{
 			calendar.setTimeInMillis(milliSeconds);		
 			Date recentDate = null;		
 				//recentDate = (Date) formatter1.parse(orderDate);
-				recentDate = (Date) calendar.getTime();				
-				System.out.println("recentDate date :"+recentDate);			
-			dates.add(recentDate);
-			System.out.println("dates date :"+dates);
+				recentDate = (Date) calendar.getTime();			
+							
+			dates.add(recentDate);		
 
 			}
 
 		};
 		scan1.forEach(action1);
 		Date latest = Collections.max(dates);
-		System.out.println("latest date :"+latest);
 		long itemdateMilliSec = latest.getTime();
 		System.out.println("itemdateMilliSec date :"+itemdateMilliSec);
 		
+		String orderuuid = "";
 		if(isPermissionGranted.equals("true")){
-	        String fullAddress = googleDTO.getFormattedAddress();
+			  String fullAddress = googleDTO.getFormattedAddress();
+			if(fullAddress != null){
+		
 	        System.out.println(fullAddress);
 	        
 	        ScanExpressionSpec xspec2 = new ExpressionSpecBuilder().withCondition(S("userId").eq(googleDTO.getUserId())
@@ -89,19 +89,46 @@ public class GooglepermissionsServiceImpl implements GoogleService{
 				
 				if (firstPage1.iterator().hasNext()) {
 					order1 = firstPage1.iterator().next();
+					orderuuid =order1.getString("orderuuid");
 					 System.out.println(order1);
 	     	 UpdateItemSpec updateItemSpec1 = new UpdateItemSpec().withPrimaryKey("uuid", order1.getString("orderuuid"))
 						.withUpdateExpression("set address = :val,pickUp = :pic")					
 						.withValueMap(new ValueMap().withString(":val", fullAddress).withString(":pic", "NULL"));					
 				UpdateItemOutcome outcome1 = orderTable.updateItem(updateItemSpec1);
 				outcome1.getItem();
-				 System.out.println(outcome1);
+				
 				}
 			GoogleResponse googleResponse = new GoogleResponse();		  
 			googleResponse.setSpeech("It's Sounds Good, Which PHONENUMBER  Would you like to add for this order.");
 			return googleResponse;
+		} else {
+			GoogleResponse googleResponse = new GoogleResponse();		  
+			googleResponse.setSpeech("Sorry, I am unable to get your address from google, please try again or choose pickup");
+			return googleResponse;
+			}
 			
 		} else {
+	        ScanExpressionSpec xspec2 = new ExpressionSpecBuilder().withCondition(S("userId").eq(googleDTO.getUserId())
+						.and(N("creationDate").ge(System.currentTimeMillis() - 900000)).and(S("itemQuantityAdd").eq("true"))
+						.and(N("creationDate").eq((Number)itemdateMilliSec)))
+						.buildForScan();
+
+				ItemCollection<ScanOutcome> scan2 = orderItemTable.scan(xspec2);
+				Item order1 = null;        
+				Page<Item, ScanOutcome> firstPage1 = scan2.firstPage();	
+				
+				if (firstPage1.iterator().hasNext()) {
+					order1 = firstPage1.iterator().next();
+					orderuuid =order1.getString("orderuuid");
+					 System.out.println(order1);
+	     	 UpdateItemSpec updateItemSpec1 = new UpdateItemSpec().withPrimaryKey("uuid", order1.getString("orderuuid"))
+						.withUpdateExpression("set address = :val,pickUp = :pic")					
+						.withValueMap(new ValueMap().withString(":val", "NULL").withString(":pic", "30 Mins"));					
+				UpdateItemOutcome outcome1 = orderTable.updateItem(updateItemSpec1);
+				outcome1.getItem();
+				 
+				}
+			
 			GoogleResponse googleResponse = new GoogleResponse();		  
 			googleResponse.setSpeech("It's ok, Please provide your phone number for this order and collect you order within 30 minutes.");
 			return googleResponse;

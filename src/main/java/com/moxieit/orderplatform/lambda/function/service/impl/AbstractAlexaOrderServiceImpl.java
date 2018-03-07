@@ -65,8 +65,8 @@ public abstract class AbstractAlexaOrderServiceImpl implements AlexaService {
 					.withNumber("creationDate", System.currentTimeMillis()).withNumber("totalBill", 0)
 					.withNumber("tax", 0).withNumber("totalBillWithTax", 0).withString("orderTracking", "ACCEPTED")
 					.withString("orderDate", date).withString("returnMessage", "true")
-					.withString("paymentDone", "true").withString("orderFrom","Alexa")
-					.withString("restaurantId","1").withString("botName", "Test");
+					.withString("paymentDone", "false").withString("orderFrom","Alexa")
+					.withString("restaurantId","23").withString("botName", "SITARA");
 				
 			orderTable.putItem(order);
 		}

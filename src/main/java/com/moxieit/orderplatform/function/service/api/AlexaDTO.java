@@ -14,6 +14,9 @@ public class AlexaDTO {
 	
 	private String deviceId;
 	
+	private String botName;
+	private String restaurantId;
+	
 	public String getApplicationId() {
 		return applicationId;
 	}
@@ -68,6 +71,22 @@ public class AlexaDTO {
 
 	public void setLaunchRequest(String launchRequest) {
 		this.launchRequest = launchRequest;
+	}
+
+	public String getBotName() {
+		return botName;
+	}
+
+	public void setBotName(String botName) {
+		this.botName = botName;
+	}
+
+	public String getRestaurantId() {
+		return restaurantId;
+	}
+
+	public void setRestaurantId(String restaurantId) {
+		this.restaurantId = restaurantId;
 	}
 
 }

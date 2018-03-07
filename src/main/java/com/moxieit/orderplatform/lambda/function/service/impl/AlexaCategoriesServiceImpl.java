@@ -1,8 +1,8 @@
 package com.moxieit.orderplatform.lambda.function.service.impl;
 
-import static com.amazonaws.services.dynamodbv2.xspec.ExpressionSpecBuilder.S;
-
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -14,31 +14,37 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.ItemCollection;
+import com.amazonaws.services.dynamodbv2.document.QueryOutcome;
 import com.amazonaws.services.dynamodbv2.document.ScanOutcome;
 import com.amazonaws.services.dynamodbv2.document.Table;
+import com.amazonaws.services.dynamodbv2.document.spec.QuerySpec;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.ScanRequest;
 import com.amazonaws.services.dynamodbv2.model.ScanResult;
 import com.amazonaws.services.dynamodbv2.xspec.ExpressionSpecBuilder;
 import com.amazonaws.services.dynamodbv2.xspec.ScanExpressionSpec;
+import static com.amazonaws.services.dynamodbv2.xspec.ExpressionSpecBuilder.S;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.moxieit.orderplatform.DB.DBService;
-import com.moxieit.orderplatform.function.service.api.GoogleDTO;
-import com.moxieit.orderplatform.function.service.api.GoogleService;
+import com.moxieit.orderplatform.function.service.api.AlexaDTO;
+import com.moxieit.orderplatform.function.service.api.AlexaService;
+import com.moxieit.orderplatform.lambda.response.AlexaResponse;
 import com.moxieit.orderplatform.lambda.response.BaseResponse;
-import com.moxieit.orderplatform.lambda.response.GoogleResponse;
+import com.moxieit.orderplatform.lambda.response.Card;
 import com.moxieit.orderplatform.lambda.response.MenuCategoryResponse;
 import com.moxieit.orderplatform.lambda.response.MenuItemResponse;
+import com.moxieit.orderplatform.lambda.response.OutputSpeech;
+import com.moxieit.orderplatform.lambda.response.Reprompt;
+import com.moxieit.orderplatform.lambda.response.Response;
+import com.moxieit.orderplatform.lambda.response.WebsiteMenuCategoryWithItemsResponse;
 
-public class GoogleCategoriesServiceImpl implements GoogleService{
-	String menuCategoryId1 ;
+public class AlexaCategoriesServiceImpl implements AlexaService {
+	
 	@Override
-	public BaseResponse serveLex(GoogleDTO googleDTO, Context context) {
-		// TODO Auto-generated method stub
+	public BaseResponse serveLex(AlexaDTO alexaDTO, Context context) {
 		StringBuilder menuItem = new StringBuilder();
+		String restaurantId = alexaDTO.getRestaurantId();		
 		
-		String restaurantId = googleDTO.getRestaurantId();	
-		System.out.println(restaurantId);
 		MenuCategoryResponse menuCategoryResponse1 = new MenuCategoryResponse();
 		RestaurantMenuImpl restaurantMenuImpl = new RestaurantMenuImpl();
 		DynamoDB dynamoDB = DBService.getDBConnection();
@@ -53,10 +59,9 @@ public class GoogleCategoriesServiceImpl implements GoogleService{
 		
 		HashMap<String, Object> valueMap1 = new HashMap<String, Object>();
 		valueMap1.put(":v_id", restaurantId);
-		valueMap1.put(":letter1", googleDTO.getIntentName());
-	
+		valueMap1.put(":letter1", alexaDTO.getRequest());
 		String categoryId=null;
-		String MenuCategoryName = WordUtils.capitalize(googleDTO.getIntentName());
+		String MenuCategoryName = WordUtils.capitalize(alexaDTO.getRequest());
 		AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard().build();
 	ScanRequest scanRequest = new ScanRequest()
 	    .withTableName("Menu_Categories").withAttributesToGet("categoryId","restaurantId","categoryName","image");
@@ -69,7 +74,8 @@ public class GoogleCategoriesServiceImpl implements GoogleService{
 		String x = item.get("categoryName").getS();
 		String categoryid = item.get("categoryId").getS();
 						
-		 if(x.replaceAll("\\s+","").equalsIgnoreCase(MenuCategoryName.replaceAll("\\s+","")) ){
+		 if(x.replaceAll("\\s+","").equalsIgnoreCase(MenuCategoryName.replaceAll("\\s+",""))||
+				 MenuCategoryName.toLowerCase().replaceAll("\\s+","").contains(x.replaceAll("\\s+","").toLowerCase()) ){
 			 if(categoryid.startsWith(restaurantId)){
 					
 				categoryId=(String) item.get("categoryId").getS();					
@@ -79,9 +85,8 @@ public class GoogleCategoriesServiceImpl implements GoogleService{
 		
 		 
 	}
-	
 		/*ScanExpressionSpec xspec1 = new ExpressionSpecBuilder().withCondition(S("restaurantId").eq(restaurantId)
-				.and(S("categoryName").beginsWith(googleDTO.getIntentName())))
+				.and(S("categoryName").beginsWith(alexaDTO.getIntentName())))
 				.buildForScan();
 		
 		ItemCollection<ScanOutcome> scan1 = menuCategoriesTable.scan(xspec1);		
@@ -94,12 +99,9 @@ public class GoogleCategoriesServiceImpl implements GoogleService{
 		}
 		};
 		scan1.forEach(action1);*/
-		System.out.println("categoryId"+categoryId);
-		
 			HashMap<String, Object> valueMap = new HashMap<String, Object>();
 			valueMap.put(":v_id", restaurantId);
 			valueMap.put(":letter1", categoryId);
-
 
 			ScanExpressionSpec xspec = new ExpressionSpecBuilder()
 					.withCondition(S("itemId").beginsWith(categoryId)).buildForScan();
@@ -113,24 +115,44 @@ public class GoogleCategoriesServiceImpl implements GoogleService{
 					String menuItemId = t.getString("itemId");
 					MenuItemResponse menuItemResponse = restaurantMenuImpl.getMenuItem(menuItemId);				
 					int itemcost = menuItemResponse.getPrice().intValue();					
-					menuItem.append(menuItemResponse.getItemName()).append(" cost ").append(itemcost).append(" dollars, ");				
+					menuItem.append(menuItemResponse.getItemName()).append(" cost ").append(itemcost).append(" dollors, ");				
 					
 				}
 			};
 			scan.forEach(action);
-			GoogleResponse googleResponse = new GoogleResponse();
-			googleResponse.setSpeech("We have "+menuItem+" What would you like.");			
-			return googleResponse;
+			System.out.println("menuitems was" +menuItem);		
+		AlexaResponse alexaResponse = new AlexaResponse();
+		Response response = new Response();
+		OutputSpeech outputSpeech = new OutputSpeech();
+		outputSpeech.setSsml(
+				"<speak>We have "+menuItem+" What would you like.</speak>");
+		outputSpeech.setType("SSML");
+		Card card = new Card();
+		card.setTitle("MenuItems");
+		card.setType("Simple");
+		card.setContent("We have "+menuItem+" What would you like.");
+		Reprompt reprompt = new Reprompt();
+		OutputSpeech outputSpeech1 = new OutputSpeech();
+		outputSpeech1.setText("Please select your option");
+		outputSpeech1.setType("PlainText");
+		reprompt.setOutputSpeech(outputSpeech1);
+		response.setReprompt(reprompt);
+		response.setShouldEndSession(false);
+		
+		response.setCard(card);
+		response.setOutputSpeech(outputSpeech);
+		alexaResponse.setVersion("1.0");
+		alexaResponse.setResponse(response);
+		return alexaResponse;
+
 	}
-	
-	public static void main(String[] args) {
-		GoogleCategoriesServiceImpl FbLoginServiveImpl = new GoogleCategoriesServiceImpl();
-		Context context = null;
-		GoogleDTO alexaDTO= new GoogleDTO();
+	/*public static void main(String[] args) {
+		AlexaCategoriesServiceImpl alexaChikuItemServiceImpl=new AlexaCategoriesServiceImpl();
+		AlexaDTO alexaDTO=new AlexaDTO();
+		alexaDTO.setUserId("AFHFYXC47SSN4DSEXYTINPFRSEGCVEN3X5RX5BNA342NRCA73VZX4G43FCQF5TI7L5RFEJD6HHQ2VXPLUSQSSHRJSIBOBZIIFYUWUFOR7Z7PVLX27NJYJYURDFOMJHVWWYE2MPXASCBCNRQUNSJPOYQKAS7IBXAYDKIWIBUIKE3WISM6OD25DFXX344QDDPLOVIUGZCVU2Y5A3A");
 		alexaDTO.setRestaurantId("23");
-		alexaDTO.setIntentName("MainCourse");
-		alexaDTO.setUserId("ABwppHHu5052upleEQrsWad_QHD4CayzF4mk24Gu1Pd3Dxn4JVd7jBSiTi3CXE7k00B7huIZJqu3QIwPAMiIh44b6Q");
-		FbLoginServiveImpl.serveLex(alexaDTO, context);
-		}
-	
+		alexaDTO.setRequest("select Drinks");
+		Context context=null;
+		alexaChikuItemServiceImpl.serveLex(alexaDTO, context);
+	}*/
 }
